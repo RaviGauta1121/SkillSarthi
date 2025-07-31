@@ -1,8 +1,8 @@
 // app/api/getDiary/route.js
-export const dynamic = 'force-dynamic'; // 🔧 Tells Next.js this route is dynamic
+export const dynamic = 'force-dynamic'; // 👈 Add this line
 
 import connectMongoDB from '@/lib/mongodb';
-import Diary from '../../../models/Dairy'; // Assuming typo is fixed to 'Diary'
+import Diary from '../../../models/Dairy'; // Make sure this is spelled correctly
 import { NextResponse } from 'next/server';
 
 export async function GET(request) {
@@ -15,18 +15,15 @@ export async function GET(request) {
     const userId = searchParams.get('userId') || 'default-user';
 
     console.log('📖 Fetching diary entries for userId:', userId);
-    
-    const diaries = await Diary.find({ userId })
-      .sort({ createdAt: -1 })
-      .lean();
-    
-    console.log('📊 Found entries:', diaries.length);
 
-    return NextResponse.json({ 
-      diaries, 
+    const diaries = await Diary.find({ userId }).sort({ createdAt: -1 }).lean();
+
+    return NextResponse.json({
+      diaries,
       count: diaries.length,
-      userId 
+      userId
     }, { status: 200 });
+
   } catch (error) {
     console.error('❌ GET error:', error);
     return NextResponse.json({
