@@ -108,6 +108,7 @@ const protectedRoutes = ["/meeting", "/diaryEditor", "/Select", "/bot"];
 // Loading Spinner Component
 const LoadingSpinner = ({ size = "sm" }) => {
   const sizeClasses = {
+    xs: "w-3 h-3",
     sm: "w-4 h-4",
     md: "w-5 h-5",
     lg: "w-6 h-6"
@@ -171,7 +172,7 @@ const ProtectedLink = ({ href, children, className, user, requiresAuth = true, s
   );
 };
 
-// Enhanced Auth Button Component
+// Enhanced Auth Button Component - MADE COMPACT
 const AuthButton = ({ 
   href, 
   children, 
@@ -179,7 +180,7 @@ const AuthButton = ({
   variant = "login",
   onClick,
   showFullLoader = false,
-  size = "default",
+  size ="compact", // Changed default to compact
   ...props 
 }) => {
   const [isClicked, setIsClicked] = React.useState(false);
@@ -202,9 +203,9 @@ const AuthButton = ({
   };
 
   const sizeClasses = {
-    default: "h-11 px-6 py-2.5 text-sm font-semibold",
-    small: "h-8 px-3 py-1.5 text-xs font-medium",
-    compact: "h-9 px-4 py-2 text-sm font-medium"
+    small: "h-7 px-2 py-1 text-xs font-medium", // Made even smaller
+    compact: "h-8 px-3 py-1.5 text-xs font-medium", // Reduced from original
+    default: "h-9 px-4 py-2 text-sm font-medium", // Smaller than original
   };
 
   const loading = isLoading || isClicked;
@@ -216,10 +217,10 @@ const AuthButton = ({
         <Loader />
         <button 
           className={cn(
-            "inline-flex w-max items-center justify-center rounded-xl transition-all duration-300 ease-out",
+            "inline-flex w-max items-center justify-center rounded-lg transition-all duration-300 ease-out", // Changed to rounded-lg
             sizeClasses[size],
             variants[variant],
-            "shadow-lg hover:shadow-xl transform hover:scale-105",
+            "shadow-md hover:shadow-lg transform hover:scale-105", // Reduced shadow
             "border border-transparent hover:border-opacity-30",
             "opacity-70 cursor-not-allowed"
           )}
@@ -236,10 +237,10 @@ const AuthButton = ({
     <Link href={href} onClick={handleClick}>
       <button 
         className={cn(
-          "inline-flex w-max items-center justify-center rounded-xl transition-all duration-300 ease-out",
+          "inline-flex w-max items-center justify-center rounded-lg transition-all duration-300 ease-out", // Changed to rounded-lg
           sizeClasses[size],
           variants[variant],
-          "shadow-lg hover:shadow-xl transform hover:scale-105",
+          "shadow-md hover:shadow-lg transform hover:scale-105", // Reduced shadow
           "border border-transparent hover:border-opacity-30",
           "disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none",
           loading && "cursor-wait"
@@ -255,10 +256,10 @@ const AuthButton = ({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.2 }}
-              className="flex items-center gap-1.5"
+              className="flex items-center gap-1"
             >
-              <LoadingSpinner size="sm" />
-              <span className="whitespace-nowrap">
+              <LoadingSpinner size="xs" />
+              <span className="whitespace-nowrap text-xs">
                 {variant === "login" ? "Signing in..." : "Signing out..."}
               </span>
             </motion.div>
@@ -269,10 +270,10 @@ const AuthButton = ({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.2 }}
-              className="flex items-center gap-1.5"
+              className="flex items-center gap-1"
             >
-              {variant === "logout" && <LogOut className="w-3.5 h-3.5" />}
-              <span className="whitespace-nowrap">{children}</span>
+              {variant === "logout" && <LogOut className="w-3 h-3" />} {/* Smaller icon */}
+              <span className="whitespace-nowrap text-xs">{children}</span> {/* Smaller text */}
             </motion.div>
           )}
         </AnimatePresence>
@@ -281,14 +282,14 @@ const AuthButton = ({
   );
 };
 
-// Enhanced User Profile Component
+// Enhanced User Profile Component - MADE COMPACT
 const UserProfile = ({ user, isLoading }) => {
   if (isLoading) {
     return (
-      <div className="flex items-center space-x-4 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-xl px-4 py-2 shadow-lg">
-        <div className="w-8 h-8 rounded-full bg-slate-700 animate-pulse" />
-        <div className="hidden sm:block w-20 h-4 bg-slate-700 rounded animate-pulse" />
-        <div className="w-16 h-8 bg-slate-700 rounded-xl animate-pulse" />
+      <div className="flex items-center space-x-2 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-lg px-3 py-1.5 shadow-md"> {/* Reduced padding and spacing */}
+        <div className="w-6 h-6 rounded-full bg-slate-700 animate-pulse" /> {/* Smaller avatar */}
+        <div className="hidden sm:block w-16 h-3 bg-slate-700 rounded animate-pulse" /> {/* Smaller name placeholder */}
+        <div className="w-12 h-6 bg-slate-700 rounded-lg animate-pulse" /> {/* Smaller button placeholder */}
       </div>
     );
   }
@@ -298,7 +299,7 @@ const UserProfile = ({ user, isLoading }) => {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
-      className="flex items-center space-x-4 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-xl px-4 py-2 shadow-lg"
+      className="flex items-center space-x-2 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-lg px-3 py-1.5 shadow-md" // Reduced padding and spacing
     >
       <motion.img
         initial={{ opacity: 0 }}
@@ -306,22 +307,23 @@ const UserProfile = ({ user, isLoading }) => {
         transition={{ delay: 0.1 }}
         src={user.picture}
         alt={`${user.name}'s profile picture`}
-        className="w-8 h-8 rounded-full border-2 border-violet-400/40 object-cover"
+        className="w-6 h-6 rounded-full border-2 border-violet-400/40 object-cover" // Smaller avatar
       />
       <motion.span
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
-        className="text-sm font-medium text-slate-200 hidden sm:block"
+        className="text-xs font-medium text-slate-200 hidden sm:block max-w-20 truncate" // Smaller text and max width
       >
         {user.name}
       </motion.span>
       <AuthButton
         href="/api/auth/logout"
         variant="logout"
+        size="small" // Use smallest size
         showFullLoader={true}
       >
-        Log Out
+        Out
       </AuthButton>
     </motion.div>
   );
@@ -358,7 +360,7 @@ export function StaticNav({
             className
           )}
         >
-          <nav className="w-full flex justify-between items-center py-4 px-6 relative">
+          <nav className="w-full flex justify-between items-center py-3 px-4 relative"> {/* Reduced padding */}
             {/* Enhanced Background with better gradients */}
             <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-violet-950/30 to-cyan-950/30" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/50 to-transparent" />
@@ -508,15 +510,15 @@ export function StaticNav({
               </NavigationMenu>
             </div>
 
-            {/* Enhanced Auth Section - Right Side */}
-            <div className="relative z-10 flex items-center space-x-4">
+            {/* Enhanced Auth Section - Right Side - MADE COMPACT */}
+            <div className="relative z-10 flex items-center space-x-2"> {/* Reduced spacing */}
               {isLoading ? (
                 // Show full screen loader for initial auth check
                 <>
                   <Loader />
-                  <div className="flex items-center space-x-4 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-xl px-4 py-2 shadow-lg opacity-70">
-                    <LoadingSpinner size="md" />
-                    <span className="text-sm text-slate-300">Loading...</span>
+                  <div className="flex items-center space-x-2 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-lg px-3 py-1.5 shadow-md opacity-70"> {/* Compact loading state */}
+                    <LoadingSpinner size="xs" />
+                    <span className="text-xs text-slate-300">Loading...</span>
                   </div>
                 </>
               ) : user ? (
@@ -524,13 +526,14 @@ export function StaticNav({
                 <UserProfile user={user} isLoading={isLoading} />
               ) : (
                 // User is not logged in
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2"> {/* Reduced spacing */}
                   <div className="text-xs text-slate-400 hidden sm:block">
-                    Login to access all features
+                    Login for all features
                   </div>
                   <AuthButton
                     href="/api/auth/login"
                     variant="login"
+                    size="small" // Use smallest size
                     showFullLoader={true}
                   >
                     Log in
@@ -543,7 +546,7 @@ export function StaticNav({
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-red-500/20 border border-red-500/30 rounded-xl px-3 py-2"
+                  className="bg-red-500/20 border border-red-500/30 rounded-lg px-2 py-1" // Smaller error display
                 >
                   <span className="text-xs text-red-300">Auth Error</span>
                 </motion.div>

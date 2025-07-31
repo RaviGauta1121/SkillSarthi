@@ -6,7 +6,7 @@ import { ChevronRight, Star, Sparkles, Code, Users, BookOpen, Zap, ArrowRight, P
 import NewSection from '@/components/Shared/NewSection';
 import CallToAction from '@/components/Shared/call-to-action';
 import FooterCurve from '@/components/Shared/footer-curve';
-
+import SkillSarthiLanding from './floatp/page';
 const InteractiveButton = ({ children, className = "", onClick, variant = "primary" }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -375,6 +375,7 @@ export default function Home() {
             </div>
           </div>
         </motion.section>
+        <SkillSarthiLanding/>
 
         {/* Why Choose Us Section */}
         <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-16 relative">
