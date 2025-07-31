@@ -3,8 +3,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 const YourPage = () => {
   return (
     <ProtectedRoute>
-    <div className="mt-10">
-      <h1>Write Your Diary</h1>
+    <div className="mt-20">
+      
       <DiaryEditor/>
     </div>
     </ProtectedRoute>
