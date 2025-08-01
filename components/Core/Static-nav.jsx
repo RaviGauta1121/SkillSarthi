@@ -172,7 +172,7 @@ const ProtectedLink = ({ href, children, className, user, requiresAuth = true, s
   );
 };
 
-// Enhanced Auth Button Component - MADE COMPACT
+// Enhanced Auth Button Component
 const AuthButton = ({ 
   href, 
   children, 
@@ -180,7 +180,7 @@ const AuthButton = ({
   variant = "login",
   onClick,
   showFullLoader = false,
-  size ="compact", // Changed default to compact
+  size = "default",
   ...props 
 }) => {
   const [isClicked, setIsClicked] = React.useState(false);
@@ -203,9 +203,9 @@ const AuthButton = ({
   };
 
   const sizeClasses = {
-    small: "h-7 px-2 py-1 text-xs font-medium", // Made even smaller
-    compact: "h-8 px-3 py-1.5 text-xs font-medium", // Reduced from original
-    default: "h-9 px-4 py-2 text-sm font-medium", // Smaller than original
+    small: "h-8 px-3 py-1.5 text-xs font-medium",
+    default: "h-9 px-4 py-2 text-sm font-medium",
+    large: "h-10 px-5 py-2.5 text-sm font-medium"
   };
 
   const loading = isLoading || isClicked;
@@ -217,10 +217,10 @@ const AuthButton = ({
         <Loader />
         <button 
           className={cn(
-            "inline-flex w-max items-center justify-center rounded-lg transition-all duration-300 ease-out", // Changed to rounded-lg
+            "inline-flex w-max items-center justify-center rounded-lg transition-all duration-300 ease-out",
             sizeClasses[size],
             variants[variant],
-            "shadow-md hover:shadow-lg transform hover:scale-105", // Reduced shadow
+            "shadow-md hover:shadow-lg transform hover:scale-105",
             "border border-transparent hover:border-opacity-30",
             "opacity-70 cursor-not-allowed"
           )}
@@ -237,10 +237,10 @@ const AuthButton = ({
     <Link href={href} onClick={handleClick}>
       <button 
         className={cn(
-          "inline-flex w-max items-center justify-center rounded-lg transition-all duration-300 ease-out", // Changed to rounded-lg
+          "inline-flex w-max items-center justify-center rounded-lg transition-all duration-300 ease-out",
           sizeClasses[size],
           variants[variant],
-          "shadow-md hover:shadow-lg transform hover:scale-105", // Reduced shadow
+          "shadow-md hover:shadow-lg transform hover:scale-105",
           "border border-transparent hover:border-opacity-30",
           "disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none",
           loading && "cursor-wait"
@@ -256,10 +256,10 @@ const AuthButton = ({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.2 }}
-              className="flex items-center gap-1"
+              className="flex items-center gap-2"
             >
               <LoadingSpinner size="xs" />
-              <span className="whitespace-nowrap text-xs">
+              <span className="whitespace-nowrap">
                 {variant === "login" ? "Signing in..." : "Signing out..."}
               </span>
             </motion.div>
@@ -270,10 +270,10 @@ const AuthButton = ({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.2 }}
-              className="flex items-center gap-1"
+              className="flex items-center gap-2"
             >
-              {variant === "logout" && <LogOut className="w-3 h-3" />} {/* Smaller icon */}
-              <span className="whitespace-nowrap text-xs">{children}</span> {/* Smaller text */}
+              {variant === "logout" && <LogOut className="w-4 h-4" />}
+              <span className="whitespace-nowrap">{children}</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -282,14 +282,14 @@ const AuthButton = ({
   );
 };
 
-// Enhanced User Profile Component - MADE COMPACT
+// Enhanced User Profile Component - Better Balanced
 const UserProfile = ({ user, isLoading }) => {
   if (isLoading) {
     return (
-      <div className="flex items-center space-x-2 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-lg px-3 py-1.5 shadow-md"> {/* Reduced padding and spacing */}
-        <div className="w-6 h-6 rounded-full bg-slate-700 animate-pulse" /> {/* Smaller avatar */}
-        <div className="hidden sm:block w-16 h-3 bg-slate-700 rounded animate-pulse" /> {/* Smaller name placeholder */}
-        <div className="w-12 h-6 bg-slate-700 rounded-lg animate-pulse" /> {/* Smaller button placeholder */}
+      <div className="flex items-center space-x-3 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-lg px-4 py-2 shadow-md">
+        <div className="w-8 h-8 rounded-full bg-slate-700 animate-pulse" />
+        <div className="hidden sm:block w-20 h-4 bg-slate-700 rounded animate-pulse" />
+        <div className="w-16 h-8 bg-slate-700 rounded-lg animate-pulse" />
       </div>
     );
   }
@@ -299,7 +299,7 @@ const UserProfile = ({ user, isLoading }) => {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
-      className="flex items-center space-x-2 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-lg px-3 py-1.5 shadow-md" // Reduced padding and spacing
+      className="flex items-center space-x-3 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-lg px-4 py-2 shadow-md"
     >
       <motion.img
         initial={{ opacity: 0 }}
@@ -307,23 +307,23 @@ const UserProfile = ({ user, isLoading }) => {
         transition={{ delay: 0.1 }}
         src={user.picture}
         alt={`${user.name}'s profile picture`}
-        className="w-6 h-6 rounded-full border-2 border-violet-400/40 object-cover" // Smaller avatar
+        className="w-8 h-8 rounded-full border-2 border-violet-400/40 object-cover"
       />
       <motion.span
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
-        className="text-xs font-medium text-slate-200 hidden sm:block max-w-20 truncate" // Smaller text and max width
+        className="text-sm font-medium text-slate-200 hidden sm:block max-w-24 truncate"
       >
         {user.name}
       </motion.span>
       <AuthButton
         href="/api/auth/logout"
         variant="logout"
-        size="small" // Use smallest size
+        size="small"
         showFullLoader={true}
       >
-        Out
+        Logout
       </AuthButton>
     </motion.div>
   );
@@ -356,25 +356,30 @@ export function StaticNav({
           exit={{ y: -100, opacity: 0 }}
           transition={{ duration: 0.2 }}
           className={cn(
-            "flex w-full z-[9999999999] fixed top-0 inset-x-0 border border-transparent dark:border-white/[0.2] rounded-b-3xl bg-white/05 backdrop-blur-sm shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] pr-2 pl-8 py-2 items-center justify-between",
+            "w-full z-[9999999999] fixed top-0 left-0 right-0 border border-transparent dark:border-white/[0.2] rounded-b-3xl bg-white/05 backdrop-blur-sm shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]",
             className
           )}
         >
-          <nav className="w-full flex justify-between items-center py-3 px-4 relative"> {/* Reduced padding */}
+          <nav className="w-full max-w-full flex justify-between items-center py-3 px-6 relative">
             {/* Enhanced Background with better gradients */}
             <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-violet-950/30 to-cyan-950/30" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/50 to-transparent" />
             
-            {/* Main Navigation - Centered */}
-            <div className="flex-1 flex justify-center relative z-10">
+            {/* Left Side - Logo/Brand Space (Optional) */}
+            <div className="flex-shrink-0 relative z-10 w-0 lg:w-auto">
+              {/* You can add a logo here if needed */}
+            </div>
+
+            {/* Center - Main Navigation */}
+            <div className="flex-1 flex justify-center relative z-10 max-w-4xl mx-auto">
               <NavigationMenu>
-                <NavigationMenuList>
+                <NavigationMenuList className="flex-wrap justify-center gap-1">
                   {/* Home Button - Always accessible */}
                   <NavigationMenuItem>
                     <Link
                       href="/"
                       className={cn(
-                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-6 py-2.5 text-sm font-semibold transition-all duration-300 ease-out",
+                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ease-out",
                         isActivePath("/") 
                           ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/30 scale-105" 
                           : "bg-gradient-to-r from-violet-600/80 to-purple-600/80 text-white hover:from-violet-600 hover:to-purple-600 hover:shadow-lg hover:shadow-violet-500/25 hover:scale-105",
@@ -382,7 +387,7 @@ export function StaticNav({
                       )}
                     >
                       <Home className="w-4 h-4" />
-                      Home
+                      <span className="hidden sm:inline">Home</span>
                     </Link>
                   </NavigationMenuItem>
 
@@ -393,7 +398,7 @@ export function StaticNav({
                       user={user}
                       requiresAuth={true}
                       className={cn(
-                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
+                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
                         isActivePath("/meeting")
                           ? "text-white bg-white/15 border-violet-400/40"
                           : "text-slate-200 hover:text-white hover:bg-white/10",
@@ -402,7 +407,7 @@ export function StaticNav({
                     >
                       <span className="relative flex items-center gap-2">
                         <Video className="w-4 h-4" />
-                        Meeting
+                        <span className="hidden sm:inline">Meeting</span>
                         <span className={cn(
                           "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
                           isActivePath("/meeting") ? "w-full" : "w-0 group-hover:w-full"
@@ -418,7 +423,7 @@ export function StaticNav({
                       user={user}
                       requiresAuth={true}
                       className={cn(
-                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
+                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
                         isActivePath("/diaryEditor")
                           ? "text-white bg-white/15 border-violet-400/40"
                           : "text-slate-200 hover:text-white hover:bg-white/10",
@@ -427,7 +432,7 @@ export function StaticNav({
                     >
                       <span className="relative flex items-center gap-2">
                         <BookOpen className="w-4 h-4" />
-                        Diary
+                        <span className="hidden sm:inline">Diary</span>
                         <span className={cn(
                           "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
                           isActivePath("/diaryEditor") ? "w-full" : "w-0 group-hover:w-full"
@@ -438,9 +443,10 @@ export function StaticNav({
 
                   {/* Student Tools Dropdown - Mixed access */}
                   <NavigationMenuItem>
-                    <NavigationMenuTrigger className="gap-2">
+                    <NavigationMenuTrigger className="gap-2 px-4">
                       <GraduationCap className="w-4 h-4" />
-                      Student Tools
+                      <span className="hidden md:inline">Student Tools</span>
+                      <span className="md:hidden">Tools</span>
                       {!user && <Lock className="w-3 h-3 text-yellow-500 ml-1" />}
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
@@ -454,7 +460,7 @@ export function StaticNav({
                             isActive={isActivePath(product.href)}
                             user={user}
                             requiresAuth={product.requiresAuth}
-                            showTooltip={false} // Don't show tooltip in dropdown
+                            showTooltip={false}
                           >
                             {product.description}
                           </ListItem>
@@ -470,7 +476,7 @@ export function StaticNav({
                       user={user}
                       requiresAuth={true}
                       className={cn(
-                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
+                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
                         isActivePath("/Select")
                           ? "text-white bg-white/15 border-violet-400/40"
                           : "text-slate-200 hover:text-white hover:bg-white/10",
@@ -479,7 +485,7 @@ export function StaticNav({
                     >
                       <span className="relative flex items-center gap-2">
                         <FileText className="w-4 h-4" />
-                        Resume
+                        <span className="hidden sm:inline">Resume</span>
                         <span className={cn(
                           "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
                           isActivePath("/Select") ? "w-full" : "w-0 group-hover:w-full"
@@ -495,7 +501,7 @@ export function StaticNav({
                       user={user}
                       requiresAuth={true}
                       className={cn(
-                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-6 py-2.5 text-sm font-semibold transition-all duration-300 ease-out",
+                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ease-out",
                         isActivePath("/bot")
                           ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30 scale-105"
                           : "bg-gradient-to-r from-cyan-500/80 to-blue-600/80 text-white hover:from-cyan-500 hover:to-blue-600 hover:shadow-lg hover:shadow-cyan-500/25 hover:scale-105",
@@ -503,40 +509,38 @@ export function StaticNav({
                       )}
                     >
                       <Bot className="w-4 h-4" />
-                      AI Chatbot
+                      <span className="hidden sm:inline">AI Chatbot</span>
+                      <span className="sm:hidden">AI</span>
                     </ProtectedLink>
                   </NavigationMenuItem>
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
 
-            {/* Enhanced Auth Section - Right Side - MADE COMPACT */}
-            <div className="relative z-10 flex items-center space-x-2"> {/* Reduced spacing */}
+            {/* Right Side - Auth Section - Better Balanced */}
+            <div className="flex-shrink-0 relative z-10 flex items-center justify-end min-w-0">
               {isLoading ? (
-                // Show full screen loader for initial auth check
-                <>
-                  <Loader />
-                  <div className="flex items-center space-x-2 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-lg px-3 py-1.5 shadow-md opacity-70"> {/* Compact loading state */}
-                    <LoadingSpinner size="xs" />
-                    <span className="text-xs text-slate-300">Loading...</span>
-                  </div>
-                </>
+                // Compact loading state
+                <div className="flex items-center space-x-3 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-lg px-4 py-2 shadow-md">
+                  <LoadingSpinner size="sm" />
+                  <span className="text-sm text-slate-300 hidden sm:inline">Loading...</span>
+                </div>
               ) : user ? (
-                // User is logged in
+                // User is logged in - Better balanced profile
                 <UserProfile user={user} isLoading={isLoading} />
               ) : (
-                // User is not logged in
-                <div className="flex items-center space-x-2"> {/* Reduced spacing */}
-                  <div className="text-xs text-slate-400 hidden sm:block">
+                // User is not logged in - Better balanced login section
+                <div className="flex items-center space-x-3">
+                  <div className="text-sm text-slate-400 hidden lg:block whitespace-nowrap">
                     Login for all features
                   </div>
                   <AuthButton
                     href="/api/auth/login"
                     variant="login"
-                    size="small" // Use smallest size
+                    size="default"
                     showFullLoader={true}
                   >
-                    Log in
+                    Sign In
                   </AuthButton>
                 </div>
               )}
@@ -546,9 +550,9 @@ export function StaticNav({
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-red-500/20 border border-red-500/30 rounded-lg px-2 py-1" // Smaller error display
+                  className="ml-3 bg-red-500/20 border border-red-500/30 rounded-lg px-3 py-2"
                 >
-                  <span className="text-xs text-red-300">Auth Error</span>
+                  <span className="text-sm text-red-300">Auth Error</span>
                 </motion.div>
               )}
             </div>

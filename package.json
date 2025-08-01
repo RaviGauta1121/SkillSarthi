@@ -42,6 +42,7 @@
     "lucide-react": "^0.436.0",
     "markdown-it": "^14.0.0",
     "mongoose": "^8.6.2",
+    "newsapi": "^2.4.1",
     "next": "^14.2.7",
     "next-auth": "^4.24.11",
     "next-themes": "^0.3.0",
