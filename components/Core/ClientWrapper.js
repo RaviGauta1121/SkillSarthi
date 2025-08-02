@@ -1,6 +1,8 @@
 "use client";
 import { Provider } from "react-redux";
 import store from "../../redux/store";
+import { createRoot } from 'react-dom/client';
+import { Auth0Provider } from '@auth0/auth0-react';
 import SessionWrapper from "@/components/SessionWrapper";
 import { FloatingNav } from "@/components/Core/Navbar";
 import { IssueButton } from "@/components/Core/IssueButton";
@@ -16,7 +18,7 @@ export default function ClientWrapper({ children }) {
         <div className="hidden md:flex">
           <FloatingNav />
         </div>
-
+        
         {/* Mobile Navigation Header */}
         <div className="md:hidden flex items-center justify-between px-4 py-3 bg-gray-900/80 backdrop-blur-md border-b border-gray-700/50 sticky top-0 z-40">
           {/* Logo */}
@@ -33,7 +35,7 @@ export default function ClientWrapper({ children }) {
               </div>
             </Link>
           </div>
-
+          
           {/* Center AI Button */}
           <div className="flex-1 flex justify-center px-4">
             <Link
@@ -45,18 +47,18 @@ export default function ClientWrapper({ children }) {
                 <Sparkles className="w-2 h-2 absolute -top-1 -right-1 text-yellow-300 animate-pulse" />
               </div>
               <span>AI Assistant</span>
-
+              
               {/* Animated glow effect */}
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-600 to-cyan-600 opacity-0 group-hover:opacity-30 blur-md transition-opacity duration-300"></div>
             </Link>
           </div>
-
+          
           {/* Menu Button */}
           <div className="flex-shrink-0">
             <Mobilenav />
           </div>
         </div>
-
+        
         <main className="h-full w-full">{children}</main>
       </SessionWrapper>
     </Provider>
