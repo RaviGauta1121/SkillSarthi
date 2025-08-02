@@ -3,13 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useUser } from '@auth0/nextjs-auth0/client'; // Ensure Auth0 is imported
 
 export default function AddTopicForm() {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [image, setImage] = useState(null);
   const router = useRouter();
-  const { user } = useUser(); // Use Auth0's useUser hook to get the authenticated user
 
   const onSubmit = async (data) => {
     try {
@@ -27,7 +25,7 @@ export default function AddTopicForm() {
           title: data.title,
           description: data.description,
           imageUrl,
-          author: user?.email, // Auth0 user's email
+          author: "Anonymous", // Default or static author
         }),
       });
 
@@ -66,15 +64,17 @@ export default function AddTopicForm() {
         {errors.description && <span className="text-xs text-red-500">{errors.description.message}</span>}
       </div>
 
-      {/* Uncomment if you have file upload */}
-      {/* <div className="flex flex-col space-y-2 w-full">
+      {/* Optional file upload */}
+      {/* 
+      <div className="flex flex-col space-y-2 w-full">
         <label htmlFor="image">Image</label>
         <input
           type="file"
           accept="image/*"
           onChange={(e) => setImage(e.target.files[0])}
         />
-      </div> */}
+      </div>
+      */}
 
       <button
         className="bg-gradient-to-br from-black to-neutral-600 block text-white rounded-md h-10 font-medium shadow-md"

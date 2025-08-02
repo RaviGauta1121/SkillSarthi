@@ -4,7 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useUser } from "@auth0/nextjs-auth0/client";
+// Updated imports for NextAuth
+import { useSession, signIn, signOut } from "next-auth/react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -172,9 +173,8 @@ const ProtectedLink = ({ href, children, className, user, requiresAuth = true, s
   );
 };
 
-// Enhanced Auth Button Component
+// Enhanced Auth Button Component for NextAuth
 const AuthButton = ({ 
-  href, 
   children, 
   isLoading = false, 
   variant = "login",
@@ -185,15 +185,26 @@ const AuthButton = ({
 }) => {
   const [isClicked, setIsClicked] = React.useState(false);
 
-  const handleClick = (e) => {
+  const handleClick = async (e) => {
     if (!isLoading) {
       setIsClicked(true);
-      onClick?.(e);
       
-      // Reset loading state after a delay to prevent infinite loading
-      setTimeout(() => {
-        setIsClicked(false);
-      }, 3000);
+      try {
+        if (variant === "login") {
+          await signIn();
+        } else {
+          await signOut();
+        }
+      } catch (error) {
+        console.error("Auth error:", error);
+      } finally {
+        // Reset loading state after a delay
+        setTimeout(() => {
+          setIsClicked(false);
+        }, 2000);
+      }
+      
+      onClick?.(e);
     }
   };
 
@@ -234,51 +245,50 @@ const AuthButton = ({
   }
 
   return (
-    <Link href={href} onClick={handleClick}>
-      <button 
-        className={cn(
-          "inline-flex w-max items-center justify-center rounded-lg transition-all duration-300 ease-out",
-          sizeClasses[size],
-          variants[variant],
-          "shadow-md hover:shadow-lg transform hover:scale-105",
-          "border border-transparent hover:border-opacity-30",
-          "disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none",
-          loading && "cursor-wait"
+    <button 
+      onClick={handleClick}
+      className={cn(
+        "inline-flex w-max items-center justify-center rounded-lg transition-all duration-300 ease-out",
+        sizeClasses[size],
+        variants[variant],
+        "shadow-md hover:shadow-lg transform hover:scale-105",
+        "border border-transparent hover:border-opacity-30",
+        "disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none",
+        loading && "cursor-wait"
+      )}
+      disabled={loading}
+      {...props}
+    >
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center gap-2"
+          >
+            <LoadingSpinner size="xs" />
+            <span className="whitespace-nowrap">
+              {variant === "login" ? "Signing in..." : "Signing out..."}
+            </span>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="text"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center gap-2"
+          >
+            {variant === "logout" && <LogOut className="w-4 h-4" />}
+            <span className="whitespace-nowrap">{children}</span>
+          </motion.div>
         )}
-        disabled={loading}
-        {...props}
-      >
-        <AnimatePresence mode="wait">
-          {loading ? (
-            <motion.div
-              key="loading"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.2 }}
-              className="flex items-center gap-2"
-            >
-              <LoadingSpinner size="xs" />
-              <span className="whitespace-nowrap">
-                {variant === "login" ? "Signing in..." : "Signing out..."}
-              </span>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="text"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.2 }}
-              className="flex items-center gap-2"
-            >
-              {variant === "logout" && <LogOut className="w-4 h-4" />}
-              <span className="whitespace-nowrap">{children}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </button>
-    </Link>
+      </AnimatePresence>
+    </button>
   );
 };
 
@@ -305,8 +315,8 @@ const UserProfile = ({ user, isLoading }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
-        src={user.picture}
-        alt={`${user.name}'s profile picture`}
+        src={user.image || "/default-avatar.png"}
+        alt={`${user.name || user.email}'s profile picture`}
         className="w-8 h-8 rounded-full border-2 border-violet-400/40 object-cover"
       />
       <motion.span
@@ -315,10 +325,9 @@ const UserProfile = ({ user, isLoading }) => {
         transition={{ delay: 0.2 }}
         className="text-sm font-medium text-slate-200 hidden sm:block max-w-24 truncate"
       >
-        {user.name}
+        {user.name || user.email}
       </motion.span>
       <AuthButton
-        href="/api/auth/logout"
         variant="logout"
         size="small"
         showFullLoader={true}
@@ -336,7 +345,7 @@ export function StaticNav({
 }) {
   const [mounted, setMounted] = React.useState(false);
   const [visible, setVisible] = React.useState(true);
-  const { user, error, isLoading } = useUser();
+  const { data: session, status } = useSession();
 
   React.useEffect(() => {
     setMounted(true);
@@ -344,8 +353,10 @@ export function StaticNav({
 
   if (!mounted) return null;
 
+  const user = session?.user;
+  const isLoading = status === "loading";
+
   const isActivePath = (href) => currentPath === href;
-  const isProtected = (href) => protectedRoutes.includes(href);
 
   return (
     <AnimatePresence>
@@ -535,7 +546,6 @@ export function StaticNav({
                     Login for all features
                   </div>
                   <AuthButton
-                    href="/api/auth/login"
                     variant="login"
                     size="default"
                     showFullLoader={true}
@@ -543,17 +553,6 @@ export function StaticNav({
                     Sign In
                   </AuthButton>
                 </div>
-              )}
-
-              {/* Error handling */}
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="ml-3 bg-red-500/20 border border-red-500/30 rounded-lg px-3 py-2"
-                >
-                  <span className="text-sm text-red-300">Auth Error</span>
-                </motion.div>
               )}
             </div>
           </nav>

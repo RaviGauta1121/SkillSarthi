@@ -1,21 +1,20 @@
-// File: components/ProtectedRoute.js
-// ==============================================
 'use client';
-import { useUser } from '@auth0/nextjs-auth0/client';
+
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function ProtectedRoute({ children, fallback = null }) {
-  const { user, error, isLoading } = useUser();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.push('/api/auth/login');
+    if (status === 'unauthenticated') {
+      router.push('/api/auth/signin');
     }
-  }, [user, isLoading, router]);
+  }, [status, router]);
 
-  if (isLoading) {
+  if (status === 'loading') {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
@@ -23,15 +22,7 @@ export default function ProtectedRoute({ children, fallback = null }) {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-red-500">Authentication error: {error.message}</div>
-      </div>
-    );
-  }
-
-  if (!user) {
+  if (status === 'unauthenticated') {
     return fallback || (
       <div className="flex items-center justify-center min-h-screen">
         <div>Redirecting to login...</div>
@@ -39,5 +30,5 @@ export default function ProtectedRoute({ children, fallback = null }) {
     );
   }
 
-    return children;
-  }
+  return children;
+}

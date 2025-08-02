@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { useUser } from "@auth0/nextjs-auth0/client";
+// Fixed import for NextAuth
+import { useSession, signIn, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { createPortal } from "react-dom";
 import { 
@@ -22,7 +23,8 @@ import {
   User,
   LogOut,
   X,
-  Sparkles
+  Sparkles,
+  Lock
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -31,51 +33,102 @@ const Products = [
     title: "Memory Matrix",
     href: "/games/memory-matrix",
     description: "Challenge your mind and master patterns and enhance cognitive agility with Memory Matrix!",
-    icon: Brain
+    icon: Brain,
+    requiresAuth: true
   },
   {
     title: "Code Editor",
     href: "/code-editor",
     description: "We provide instant, accurate, and personalized solutions to doubts.",
-    icon: Code
+    icon: Code,
+    requiresAuth: true
   },
   {
     title: "Syntax Slayer",
     href: "/games/syntax-slayer",
     description: "Syntax Slayer is a fast-paced coding game where players sharpen debugging skills by battling coding errors.",
-    icon: Sword
+    icon: Sword,
+    requiresAuth: true
   },
   {
     title: "Pomodoro Timer",
     href: "/pomodoro-timer",
     description: "The Pomodoro Timer enhances focus, productivity, and time management through structured work-break intervals.",
-    icon: Clock
+    icon: Clock,
+    requiresAuth: true
   },
   {
     title: "Todo",
     href: "/todo",
     description: "A to-do list helps manage tasks by organizing priorities, increasing focus, and tracking progress efficiently.",
-    icon: CheckSquare
+    icon: CheckSquare,
+    requiresAuth: true
   },
   {
     title: "Mentorship",
     href: "/mentorship",
     description: "We provide mentorship through personalized guidance, problem-solving, and continuous support using AI insights.",
-    icon: Users
+    icon: Users,
+    requiresAuth: true
   },
   {
     title: "Doubts",
     href: "/doubts",
     description: "A unique code editor offers real-time collaboration, error detection, and intelligent suggestions.",
-    icon: HelpCircle
+    icon: HelpCircle,
+    requiresAuth: true
   },
   {
     title: "Articles",
     href: "/articles",
     description: "A unique chatbot offers instant responses, personalized interactions, and 24/7 support.",
-    icon: BookMarked
+    icon: BookMarked,
+    requiresAuth: false
   },
 ];
+
+// Protected Link Component
+const ProtectedLink = ({ href, children, onClick, className, user, requiresAuth = true, ...props }) => {
+  const [showPrompt, setShowPrompt] = useState(false);
+
+  const handleClick = (e) => {
+    if (requiresAuth && !user) {
+      e.preventDefault();
+      setShowPrompt(true);
+      setTimeout(() => setShowPrompt(false), 2000);
+      return;
+    }
+    onClick?.(e);
+  };
+
+  if (requiresAuth && !user) {
+    return (
+      <div className="relative">
+        <button
+          onClick={handleClick}
+          className={`${className} opacity-60 cursor-not-allowed w-full text-left`}
+          {...props}
+        >
+          <div className="flex items-center justify-between">
+            {children}
+            <Lock className="w-4 h-4 text-yellow-500 ml-2" />
+          </div>
+        </button>
+        {showPrompt && (
+          <div className="absolute top-full left-0 right-0 mt-1 px-2 py-1 bg-red-500/20 border border-red-500/30 rounded text-xs text-red-300 text-center">
+            Login required
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <Link href={href} onClick={handleClick} className={className} {...props}>
+      {children}
+    </Link>
+  );
+};
 
 function MobileMenuContent({ isOpen, onClose, user, pathname }) {
   const [isStudentToolsOpen, setIsStudentToolsOpen] = useState(false);
@@ -107,6 +160,24 @@ function MobileMenuContent({ isOpen, onClose, user, pathname }) {
     setTimeout(() => {
       onClose();
     }, 100);
+  };
+
+  const handleSignIn = async () => {
+    try {
+      await signIn();
+      handleLinkClick();
+    } catch (error) {
+      console.error("Sign in error:", error);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      handleLinkClick();
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
   };
 
   if (!isOpen) return null;
@@ -160,26 +231,25 @@ function MobileMenuContent({ isOpen, onClose, user, pathname }) {
             {user ? (
               <div className="flex items-center space-x-3 bg-gray-800/60 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-700/30">
                 <img
-                  src={user.picture}
-                  alt={`${user.name}'s profile picture`}
+                  src={user.image || "/default-avatar.png"}
+                  alt={`${user.name || user.email}'s profile picture`}
                   className="w-10 h-10 rounded-full border-2 border-violet-400 object-cover"
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">{user.name}</p>
+                  <p className="text-sm font-medium text-white truncate">{user.name || user.email}</p>
                   <p className="text-xs text-gray-400 truncate">{user.email}</p>
                 </div>
               </div>
             ) : (
               <div className="text-center">
                 <p className="text-gray-400 text-sm mb-3">Not logged in</p>
-                <Link
-                  href="/api/auth/login"
-                  onClick={handleLinkClick}
+                <button
+                  onClick={handleSignIn}
                   className="inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <User className="w-4 h-4 mr-2" />
                   Log in
-                </Link>
+                </button>
               </div>
             )}
           </div>
@@ -200,10 +270,12 @@ function MobileMenuContent({ isOpen, onClose, user, pathname }) {
               <span className="font-medium">Home</span>
             </Link>
 
-            {/* AI Chatbot - Featured */}
-            <Link
+            {/* AI Chatbot - Protected */}
+            <ProtectedLink
               href="/bot"
               onClick={handleLinkClick}
+              user={user}
+              requiresAuth={true}
               className={`flex items-center gap-3 rounded-xl p-3 transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-violet-500 ${
                 isActivePath("/bot")
                   ? "bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-violet-500"
@@ -218,12 +290,14 @@ function MobileMenuContent({ isOpen, onClose, user, pathname }) {
               <div className="ml-auto text-xs bg-violet-500 text-white px-2 py-1 rounded-full flex-shrink-0">
                 New
               </div>
-            </Link>
+            </ProtectedLink>
 
-            {/* Meeting */}
-            <Link
+            {/* Meeting - Protected */}
+            <ProtectedLink
               href="/meeting"
               onClick={handleLinkClick}
+              user={user}
+              requiresAuth={true}
               className={`flex items-center gap-3 rounded-xl p-3 transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 ${
                 isActivePath("/meeting")
                   ? "bg-violet-600 text-white"
@@ -232,12 +306,14 @@ function MobileMenuContent({ isOpen, onClose, user, pathname }) {
             >
               <Video className="w-5 h-5 flex-shrink-0" />
               <span className="font-medium">Meeting</span>
-            </Link>
+            </ProtectedLink>
 
-            {/* Diary */}
-            <Link
+            {/* Diary - Protected */}
+            <ProtectedLink
               href="/diaryEditor"
               onClick={handleLinkClick}
+              user={user}
+              requiresAuth={true}
               className={`flex items-center gap-3 rounded-xl p-3 transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 ${
                 isActivePath("/diaryEditor")
                   ? "bg-violet-600 text-white"
@@ -246,7 +322,7 @@ function MobileMenuContent({ isOpen, onClose, user, pathname }) {
             >
               <BookOpen className="w-5 h-5 flex-shrink-0" />
               <span className="font-medium">Diary</span>
-            </Link>
+            </ProtectedLink>
 
             {/* Student Tools Dropdown */}
             <div>
@@ -258,6 +334,7 @@ function MobileMenuContent({ isOpen, onClose, user, pathname }) {
                 <div className="flex items-center gap-3">
                   <GraduationCap className="w-5 h-5 flex-shrink-0" />
                   <span className="font-medium">Student Tools</span>
+                  {!user && <Lock className="w-4 h-4 text-yellow-500" />}
                 </div>
                 <ChevronDown className={`w-4 h-4 flex-shrink-0 transition-transform duration-300 ${
                   isStudentToolsOpen ? "rotate-180" : ""
@@ -269,10 +346,12 @@ function MobileMenuContent({ isOpen, onClose, user, pathname }) {
                 isStudentToolsOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
                 {Products.map((product) => (
-                  <Link
+                  <ProtectedLink
                     key={product.title}
                     href={product.href}
                     onClick={handleLinkClick}
+                    user={user}
+                    requiresAuth={product.requiresAuth}
                     className={`flex items-center gap-3 rounded-lg p-2.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 ${
                       isActivePath(product.href)
                         ? "bg-violet-600 text-white"
@@ -284,15 +363,17 @@ function MobileMenuContent({ isOpen, onClose, user, pathname }) {
                       <div className="font-medium truncate">{product.title}</div>
                       <div className="text-xs text-gray-500 truncate">{product.description}</div>
                     </div>
-                  </Link>
+                  </ProtectedLink>
                 ))}
               </div>
             </div>
 
-            {/* Resume */}
-            <Link
+            {/* Resume - Protected */}
+            <ProtectedLink
               href="/Select"
               onClick={handleLinkClick}
+              user={user}
+              requiresAuth={true}
               className={`flex items-center gap-3 rounded-xl p-3 transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 ${
                 isActivePath("/Select")
                   ? "bg-violet-600 text-white"
@@ -301,20 +382,19 @@ function MobileMenuContent({ isOpen, onClose, user, pathname }) {
             >
               <FileText className="w-5 h-5 flex-shrink-0" />
               <span className="font-medium">Resume</span>
-            </Link>
+            </ProtectedLink>
           </div>
 
           {/* Footer with Logout */}
           {user && (
             <div className="p-6 border-t border-gray-700/50 flex-shrink-0">
-              <Link
-                href="/api/auth/logout"
-                onClick={handleLinkClick}
-                className="flex items-center gap-3 rounded-xl p-3 text-gray-300 hover:text-white hover:bg-red-800/60 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+              <button
+                onClick={handleSignOut}
+                className="flex items-center gap-3 rounded-xl p-3 text-gray-300 hover:text-white hover:bg-red-800/60 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 w-full"
               >
                 <LogOut className="w-5 h-5 flex-shrink-0" />
                 <span className="font-medium">Log Out</span>
-              </Link>
+              </button>
             </div>
           )}
         </div>
@@ -326,8 +406,10 @@ function MobileMenuContent({ isOpen, onClose, user, pathname }) {
 export function Mobilenav() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { user } = useUser();
+  const { data: session, status } = useSession();
   const pathname = usePathname();
+
+  const user = session?.user;
 
   // Ensure component is mounted before rendering portal
   useEffect(() => {

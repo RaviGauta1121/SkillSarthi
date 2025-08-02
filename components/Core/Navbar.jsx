@@ -1,14 +1,15 @@
 "use client";
+
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { StaticNav } from "./Static-nav";
-
+import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useUser } from "@auth0/nextjs-auth0/client";
+
 export const FloatingNav = ({ className }) => {
   const [visible, setVisible] = useState(true);
-  const { user, error, isLoading } = useUser();
+  const { data: session, status } = useSession(); // useSession from next-auth
 
   return (
     <AnimatePresence>
@@ -25,8 +26,21 @@ export const FloatingNav = ({ className }) => {
         >
           <StaticNav color={"red-600"} />
 
-         
-          
+          {/* Example session usage */}
+          {status === "authenticated" ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-800">
+                Welcome, {session.user?.name}
+              </span>
+              <Link href="/api/auth/signout" className="text-blue-600 hover:underline">
+                Sign Out
+              </Link>
+            </div>
+          ) : (
+            <Link href="/api/auth/signin" className="text-blue-600 hover:underline">
+              Sign In
+            </Link>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

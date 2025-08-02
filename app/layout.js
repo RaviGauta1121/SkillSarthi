@@ -1,8 +1,9 @@
 import { Inter } from "next/font/google";
 import "./globals.scss";
 
-import { UserProvider } from "@auth0/nextjs-auth0/client";
-import ClientWrapper from "@/components/Core/ClientWrapper";
+import SessionWrapper from "@/components/SessionWrapper"; // your custom wrapper for next-auth
+import ClientWrapper from "@/components/Core/ClientWrapper"; // optional, if you're still using it
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -14,9 +15,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <UserProvider>
+        <SessionWrapper>
           <ClientWrapper>{children}</ClientWrapper>
-        </UserProvider>
+        </SessionWrapper>
       </body>
     </html>
   );
