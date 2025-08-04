@@ -3,30 +3,26 @@ import React, { useState } from "react";
 import { Label } from "@/components/Signup/label";
 import { Input } from "@/components/Signup/input";
 import { cn } from "@/lib/utils";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import {
   IconBrandGithub,
   IconBrandGoogle,
   IconLoader2,
-  IconUserPlus,
+  IconShield,
   IconMail,
   IconLock,
-  IconUser,
   IconEye,
   IconEyeOff,
-  IconCheck,
-  IconX,
 } from "@tabler/icons-react";
 
-export function FormalSignupForm() {
+export function FormalSigninForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0);
   const router = useRouter();
 
   React.useEffect(() => {
@@ -36,61 +32,33 @@ export function FormalSignupForm() {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm();
-
-  const watchPassword = watch("password", "");
-
-  React.useEffect(() => {
-    const calculateStrength = (password) => {
-      let strength = 0;
-      if (password.length >= 8) strength++;
-      if (/[A-Z]/.test(password)) strength++;
-      if (/[a-z]/.test(password)) strength++;
-      if (/\d/.test(password)) strength++;
-      if (/[^A-Za-z0-9]/.test(password)) strength++;
-      return strength;
-    };
-    setPasswordStrength(calculateStrength(watchPassword));
-  }, [watchPassword]);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
     setMessage("");
     
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Registration failed");
-      }
-
-      setMessage("Account created successfully! Signing you in...");
-      setMessageType("success");
-      
-      setTimeout(async () => {
-        const signInResult = await signIn("credentials", {
-          email: data.email,
-          password: data.password,
-          redirect: false,
-        });
-
-        if (signInResult?.ok) {
+      if (result?.error) {
+        setMessage("Invalid credentials. Please check your email and password.");
+        setMessageType("error");
+      } else if (result?.ok) {
+        setMessage("Welcome back! Redirecting to dashboard...");
+        setMessageType("success");
+        
+        setTimeout(() => {
           router.push("/");
-        }
-      }, 2000);
-
+        }, 1500);
+      }
     } catch (error) {
-      setMessage(error.message);
+      setMessage("An unexpected error occurred. Please try again.");
       setMessageType("error");
     } finally {
       setIsLoading(false);
@@ -100,36 +68,24 @@ export function FormalSignupForm() {
   const handleSocialSignIn = async (provider) => {
     setIsLoading(true);
     try {
-      await signIn(provider, { 
+      const result = await signIn(provider, { 
         callbackUrl: "/",
-        redirect: true 
+        redirect: false 
       });
+      
+      if (result?.url) {
+        window.location.href = result.url;
+      }
     } catch (error) {
-      setMessage(`Failed to sign up with ${provider}. Please try again.`);
+      setMessage(`Failed to sign in with ${provider}. Please try again.`);
       setMessageType("error");
       setIsLoading(false);
     }
   };
 
-  const getPasswordStrengthColor = () => {
-    if (passwordStrength <= 1) return "bg-red-500";
-    if (passwordStrength <= 2) return "bg-orange-500";
-    if (passwordStrength <= 3) return "bg-yellow-500";
-    if (passwordStrength <= 4) return "bg-blue-500";
-    return "bg-green-500";
-  };
-
-  const getPasswordStrengthText = () => {
-    if (passwordStrength <= 1) return "Weak";
-    if (passwordStrength <= 2) return "Fair";
-    if (passwordStrength <= 3) return "Good";
-    if (passwordStrength <= 4) return "Strong";
-    return "Very Strong";
-  };
-
   return (
     <div className={cn(
-      "max-w-lg w-full mx-auto backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl",
+      "max-w-md w-full mx-auto backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl",
       "transform transition-all duration-1000 ease-out",
       isVisible 
         ? "translate-y-0 opacity-100 scale-100" 
@@ -138,11 +94,11 @@ export function FormalSignupForm() {
       {/* Header with animation */}
       <div className="text-center mb-8">
         <div className={cn(
-          "inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl mb-4 shadow-lg",
+          "inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-4 shadow-lg",
           "transform transition-all duration-700 delay-300",
           isVisible ? "rotate-0 scale-100" : "rotate-180 scale-0"
         )}>
-          <IconUserPlus className="w-8 h-8 text-white" />
+          <IconShield className="w-8 h-8 text-white" />
         </div>
         
         <h1 className={cn(
@@ -150,7 +106,7 @@ export function FormalSignupForm() {
           "transform transition-all duration-700 delay-500",
           isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         )}>
-          Join Skill Sarthi
+          Welcome Back
         </h1>
         
         <p className={cn(
@@ -158,7 +114,7 @@ export function FormalSignupForm() {
           "transform transition-all duration-700 delay-700",
           isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         )}>
-          Create your account to unlock all features
+          Sign in to access your Skill Sarthi account
         </p>
       </div>
 
@@ -178,82 +134,9 @@ export function FormalSignupForm() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Name Fields */}
-        <div className={cn(
-          "grid grid-cols-2 gap-4",
-          "transform transition-all duration-700 delay-900",
-          isVisible ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
-        )}>
-          <div>
-            <Label htmlFor="firstName" className="text-gray-300 font-medium mb-2 block">
-              First Name
-            </Label>
-            <div className="relative group">
-              <IconUser className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-400 transition-colors duration-200" />
-              <Input
-                id="firstName"
-                type="text"
-                placeholder="First name"
-                disabled={isLoading}
-                className={cn(
-                  "pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400",
-                  "focus:border-blue-400/50 focus:bg-white/10 transition-all duration-200",
-                  "hover:border-white/20 hover:bg-white/5",
-                  errors.firstName && "border-red-400/50 focus:border-red-400/50"
-                )}
-                {...register("firstName", {
-                  required: "First name is required",
-                  minLength: {
-                    value: 2,
-                    message: "First name must be at least 2 characters"
-                  }
-                })}
-              />
-            </div>
-            {errors.firstName && (
-              <p className="text-red-400 text-xs mt-2 animate-in slide-in-from-left-1 duration-200">
-                {errors.firstName.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="lastName" className="text-gray-300 font-medium mb-2 block">
-              Last Name
-            </Label>
-            <div className="relative group">
-              <IconUser className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-400 transition-colors duration-200" />
-              <Input
-                id="lastName"
-                type="text"
-                placeholder="Last name"
-                disabled={isLoading}
-                className={cn(
-                  "pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400",
-                  "focus:border-blue-400/50 focus:bg-white/10 transition-all duration-200",
-                  "hover:border-white/20 hover:bg-white/5",
-                  errors.lastName && "border-red-400/50 focus:border-red-400/50"
-                )}
-                {...register("lastName", {
-                  required: "Last name is required",
-                  minLength: {
-                    value: 2,
-                    message: "Last name must be at least 2 characters"
-                  }
-                })}
-              />
-            </div>
-            {errors.lastName && (
-              <p className="text-red-400 text-xs mt-2 animate-in slide-in-from-left-1 duration-200">
-                {errors.lastName.message}
-              </p>
-            )}
-          </div>
-        </div>
-
         {/* Email Field */}
         <div className={cn(
-          "transform transition-all duration-700 delay-1000",
+          "transform transition-all duration-700 delay-900",
           isVisible ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
         )}>
           <Label htmlFor="email" className="text-gray-300 font-medium mb-2 block">
@@ -290,7 +173,7 @@ export function FormalSignupForm() {
 
         {/* Password Field */}
         <div className={cn(
-          "transform transition-all duration-700 delay-1100",
+          "transform transition-all duration-700 delay-1000",
           isVisible ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
         )}>
           <Label htmlFor="password" className="text-gray-300 font-medium mb-2 block">
@@ -301,7 +184,7 @@ export function FormalSignupForm() {
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
-              placeholder="Create a strong password"
+              placeholder="Enter your password"
               disabled={isLoading}
               className={cn(
                 "pl-12 pr-12 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400",
@@ -311,14 +194,6 @@ export function FormalSignupForm() {
               )}
               {...register("password", {
                 required: "Password is required",
-                minLength: {
-                  value: 8,
-                  message: "Password must be at least 8 characters long",
-                },
-                pattern: {
-                  value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/,
-                  message: "Password must contain at least one letter and one number",
-                },
               })}
             />
             <button
@@ -329,34 +204,6 @@ export function FormalSignupForm() {
               {showPassword ? <IconEyeOff className="w-5 h-5" /> : <IconEye className="w-5 h-5" />}
             </button>
           </div>
-          
-          {/* Password Strength Indicator */}
-          {watchPassword && (
-            <div className="mt-3 space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-400">Password Strength</span>
-                <span className={cn(
-                  "text-xs font-medium",
-                  passwordStrength <= 2 ? "text-red-400" : 
-                  passwordStrength <= 3 ? "text-yellow-400" : "text-green-400"
-                )}>
-                  {getPasswordStrengthText()}
-                </span>
-              </div>
-              <div className="flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className={cn(
-                      "h-1 flex-1 rounded-full transition-all duration-300",
-                      i < passwordStrength ? getPasswordStrengthColor() : "bg-gray-600"
-                    )}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-          
           {errors.password && (
             <p className="text-red-400 text-xs mt-2 animate-in slide-in-from-left-1 duration-200">
               {errors.password.message}
@@ -364,27 +211,27 @@ export function FormalSignupForm() {
           )}
         </div>
 
-        {/* Sign Up Button */}
+        {/* Sign In Button */}
         <div className={cn(
-          "transform transition-all duration-700 delay-1200",
+          "transform transition-all duration-700 delay-1100",
           isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         )}>
           <button
             type="submit"
             disabled={isLoading || isSubmitting}
             className={cn(
-              "w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl",
-              "hover:from-blue-700 hover:to-indigo-700 transform hover:scale-[1.02] active:scale-[0.98]",
+              "w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl",
+              "hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] active:scale-[0.98]",
               "transition-all duration-200 shadow-lg hover:shadow-xl",
               "disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none",
               "relative overflow-hidden group"
             )}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-400 opacity-0 group-hover:opacity-20 transition-opacity duration-200"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 opacity-0 group-hover:opacity-20 transition-opacity duration-200"></div>
             <div className="relative flex items-center justify-center gap-2">
               {isLoading && <IconLoader2 className="w-4 h-4 animate-spin" />}
-              <span>{isLoading ? "Creating Account..." : "Create Account"}</span>
-              {!isLoading && <IconUserPlus className="w-4 h-4" />}
+              <span>{isLoading ? "Signing in..." : "Sign In"}</span>
+              {!isLoading && <IconShield className="w-4 h-4" />}
             </div>
           </button>
         </div>
@@ -392,7 +239,7 @@ export function FormalSignupForm() {
         {/* Divider */}
         <div className={cn(
           "relative my-8",
-          "transform transition-all duration-700 delay-1300",
+          "transform transition-all duration-700 delay-1200",
           isVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}>
           <div className="absolute inset-0 flex items-center">
@@ -400,7 +247,7 @@ export function FormalSignupForm() {
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="px-4 bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 text-gray-400">
-              Or sign up with
+              Or continue with
             </span>
           </div>
         </div>
@@ -408,7 +255,7 @@ export function FormalSignupForm() {
         {/* Social Login Buttons */}
         <div className={cn(
           "grid grid-cols-2 gap-4",
-          "transform transition-all duration-700 delay-1400",
+          "transform transition-all duration-700 delay-1300",
           isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         )}>
           <button
@@ -440,20 +287,20 @@ export function FormalSignupForm() {
           </button>
         </div>
 
-        {/* Sign In Link */}
+        {/* Sign Up Link */}
         <div className={cn(
           "text-center pt-6 border-t border-gray-700",
-          "transform transition-all duration-700 delay-1500",
+          "transform transition-all duration-700 delay-1400",
           isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         )}>
           <p className="text-gray-400 text-sm">
-            Already have an account?{" "}
+            Don't have an account?{" "}
             <button
               type="button"
-              onClick={() => router.push("/auth/signin")}
+              onClick={() => router.push("/auth/signup")}
               className="text-blue-400 hover:text-blue-300 font-medium hover:underline transition-colors duration-200"
             >
-              Sign in here
+              Create one now
             </button>
           </p>
         </div>

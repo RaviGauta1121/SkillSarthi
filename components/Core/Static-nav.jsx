@@ -4,8 +4,6 @@ import * as React from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-// Updated imports for NextAuth
-import { useSession, signIn, signOut } from "next-auth/react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -14,27 +12,24 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/UI2/navigation-menu";
-import { 
-  ChevronDown, 
-  Home, 
-  Video, 
-  BookOpen, 
-  GraduationCap, 
-  FileText, 
-  Bot, 
-  Brain, 
-  Code, 
-  Sword, 
-  Clock, 
-  CheckSquare, 
-  Users, 
-  HelpCircle, 
+import {
+  ChevronDown,
+  Home,
+  Video,
+  BookOpen,
+  GraduationCap,
+  FileText,
+  Bot,
+  Brain,
+  Code,
+  Sword,
+  Clock,
+  CheckSquare,
+  Users,
+  HelpCircle,
   BookMarked,
-  Loader2,
-  LogOut,
-  Lock
+  Lock,
 } from "lucide-react";
-import Loader from "../../components/loader/loader";
 
 const Products = [
   {
@@ -43,7 +38,7 @@ const Products = [
     description:
       "Challenge your mind and master patterns and enhance cognitive agility with Memory Matrix!",
     icon: Brain,
-    requiresAuth: true
+    requiresAuth: true,
   },
   {
     title: "Code Editor",
@@ -51,7 +46,7 @@ const Products = [
     description:
       "We provide instant, accurate, and personalized solutions to doubts.",
     icon: Code,
-    requiresAuth: true
+    requiresAuth: true,
   },
   {
     title: "Syntax Slayer",
@@ -59,7 +54,7 @@ const Products = [
     description:
       "Syntax Slayer is a fast-paced coding game where players sharpen debugging skills by battling coding errors.",
     icon: Sword,
-    requiresAuth: true
+    requiresAuth: true,
   },
   {
     title: "Pomodoro Timer",
@@ -67,7 +62,7 @@ const Products = [
     description:
       "The Pomodoro Timer enhances focus, productivity, and time management through structured work-break intervals.",
     icon: Clock,
-    requiresAuth: true
+    requiresAuth: true,
   },
   {
     title: "Todo",
@@ -75,7 +70,7 @@ const Products = [
     description:
       "A to-do list helps manage tasks by organizing priorities, increasing focus, and tracking progress efficiently.",
     icon: CheckSquare,
-    requiresAuth: true
+    requiresAuth: true,
   },
   {
     title: "Mentorship",
@@ -83,7 +78,7 @@ const Products = [
     description:
       "We provide mentorship through personalized guidance, problem-solving, and continuous support using AI insights.",
     icon: Users,
-    requiresAuth: true
+    requiresAuth: true,
   },
   {
     title: "Doubts",
@@ -91,7 +86,7 @@ const Products = [
     description:
       "A unique code editor offers real-time collaboration, error detection, and intelligent suggestions.",
     icon: HelpCircle,
-    requiresAuth: true
+    requiresAuth: true,
   },
   {
     title: "Articles",
@@ -99,31 +94,22 @@ const Products = [
     description:
       "A unique chatbot offers instant responses, personalized interactions, and 24/7 support.",
     icon: BookMarked,
-    requiresAuth: false // Articles can be public
+    requiresAuth: false, // Articles can be public
   },
 ];
 
-// Protected navigation items
-const protectedRoutes = ["/meeting", "/diaryEditor", "/Select", "/bot"];
-
-// Loading Spinner Component
-const LoadingSpinner = ({ size = "sm" }) => {
-  const sizeClasses = {
-    xs: "w-3 h-3",
-    sm: "w-4 h-4",
-    md: "w-5 h-5",
-    lg: "w-6 h-6"
-  };
-
-  return (
-    <Loader2 className={cn("animate-spin", sizeClasses[size])} />
-  );
-};
-
 // Protected Link Component
-const ProtectedLink = ({ href, children, className, user, requiresAuth = true, showTooltip = true, ...props }) => {
+const ProtectedLink = ({
+  href,
+  children,
+  className,
+  user,
+  requiresAuth = true,
+  showTooltip = true,
+  ...props
+}) => {
   const [showLoginPrompt, setShowLoginPrompt] = React.useState(false);
-  
+
   const handleClick = (e) => {
     if (requiresAuth && !user) {
       e.preventDefault();
@@ -147,7 +133,7 @@ const ProtectedLink = ({ href, children, className, user, requiresAuth = true, s
           {children}
           <Lock className="w-3 h-3 absolute -top-1 -right-1 text-yellow-500" />
         </button>
-        
+
         {/* Login prompt tooltip */}
         <AnimatePresence>
           {showLoginPrompt && showTooltip && (
@@ -173,179 +159,14 @@ const ProtectedLink = ({ href, children, className, user, requiresAuth = true, s
   );
 };
 
-// Enhanced Auth Button Component for NextAuth
-const AuthButton = ({ 
-  children, 
-  isLoading = false, 
-  variant = "login",
-  onClick,
-  showFullLoader = false,
-  size = "default",
-  ...props 
-}) => {
-  const [isClicked, setIsClicked] = React.useState(false);
-
-  const handleClick = async (e) => {
-    if (!isLoading) {
-      setIsClicked(true);
-      
-      try {
-        if (variant === "login") {
-          await signIn();
-        } else {
-          await signOut();
-        }
-      } catch (error) {
-        console.error("Auth error:", error);
-      } finally {
-        // Reset loading state after a delay
-        setTimeout(() => {
-          setIsClicked(false);
-        }, 2000);
-      }
-      
-      onClick?.(e);
-    }
-  };
-
-  const variants = {
-    login: "bg-gradient-to-r from-sky-600/90 to-sky-700/90 text-white hover:from-sky-600 hover:to-sky-700 hover:shadow-sky-500/25 border-sky-400/30",
-    logout: "bg-gradient-to-r from-red-600/90 to-red-700/90 text-white hover:from-red-600 hover:to-red-700 hover:shadow-red-500/25 border-red-400/30"
-  };
-
-  const sizeClasses = {
-    small: "h-8 px-3 py-1.5 text-xs font-medium",
-    default: "h-9 px-4 py-2 text-sm font-medium",
-    large: "h-10 px-5 py-2.5 text-sm font-medium"
-  };
-
-  const loading = isLoading || isClicked;
-
-  // Show full screen loader for major auth operations
-  if (loading && showFullLoader) {
-    return (
-      <>
-        <Loader />
-        <button 
-          className={cn(
-            "inline-flex w-max items-center justify-center rounded-lg transition-all duration-300 ease-out",
-            sizeClasses[size],
-            variants[variant],
-            "shadow-md hover:shadow-lg transform hover:scale-105",
-            "border border-transparent hover:border-opacity-30",
-            "opacity-70 cursor-not-allowed"
-          )}
-          disabled={true}
-          {...props}
-        >
-          {children}
-        </button>
-      </>
-    );
-  }
-
-  return (
-    <button 
-      onClick={handleClick}
-      className={cn(
-        "inline-flex w-max items-center justify-center rounded-lg transition-all duration-300 ease-out",
-        sizeClasses[size],
-        variants[variant],
-        "shadow-md hover:shadow-lg transform hover:scale-105",
-        "border border-transparent hover:border-opacity-30",
-        "disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none",
-        loading && "cursor-wait"
-      )}
-      disabled={loading}
-      {...props}
-    >
-      <AnimatePresence mode="wait">
-        {loading ? (
-          <motion.div
-            key="loading"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2 }}
-            className="flex items-center gap-2"
-          >
-            <LoadingSpinner size="xs" />
-            <span className="whitespace-nowrap">
-              {variant === "login" ? "Signing in..." : "Signing out..."}
-            </span>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="text"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2 }}
-            className="flex items-center gap-2"
-          >
-            {variant === "logout" && <LogOut className="w-4 h-4" />}
-            <span className="whitespace-nowrap">{children}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </button>
-  );
-};
-
-// Enhanced User Profile Component - Better Balanced
-const UserProfile = ({ user, isLoading }) => {
-  if (isLoading) {
-    return (
-      <div className="flex items-center space-x-3 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-lg px-4 py-2 shadow-md">
-        <div className="w-8 h-8 rounded-full bg-slate-700 animate-pulse" />
-        <div className="hidden sm:block w-20 h-4 bg-slate-700 rounded animate-pulse" />
-        <div className="w-16 h-8 bg-slate-700 rounded-lg animate-pulse" />
-      </div>
-    );
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
-      className="flex items-center space-x-3 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-lg px-4 py-2 shadow-md"
-    >
-      <motion.img
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        src={user.image || "/default-avatar.png"}
-        alt={`${user.name || user.email}'s profile picture`}
-        className="w-8 h-8 rounded-full border-2 border-violet-400/40 object-cover"
-      />
-      <motion.span
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.2 }}
-        className="text-sm font-medium text-slate-200 hidden sm:block max-w-24 truncate"
-      >
-        {user.name || user.email}
-      </motion.span>
-      <AuthButton
-        variant="logout"
-        size="small"
-        showFullLoader={true}
-      >
-        Logout
-      </AuthButton>
-    </motion.div>
-  );
-};
-
-export function StaticNav({ 
-  color = "white", 
+export function StaticNav({
+  color = "white",
   currentPath = "/",
-  className 
+  className,
+  user = null, // Accept user prop from parent
+  isLoading = false, // Accept loading state from parent
 }) {
   const [mounted, setMounted] = React.useState(false);
-  const [visible, setVisible] = React.useState(true);
-  const { data: session, status } = useSession();
 
   React.useEffect(() => {
     setMounted(true);
@@ -353,220 +174,187 @@ export function StaticNav({
 
   if (!mounted) return null;
 
-  const user = session?.user;
-  const isLoading = status === "loading";
-
   const isActivePath = (href) => currentPath === href;
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          initial={{ opacity: 0, y: -100 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -100, opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className={cn(
-            "w-full z-[9999999999] fixed top-0 left-0 right-0 border border-transparent dark:border-white/[0.2] rounded-b-3xl bg-white/05 backdrop-blur-sm shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]",
-            className
-          )}
-        >
-          <nav className="w-full max-w-full flex justify-between items-center py-3 px-6 relative">
-            {/* Enhanced Background with better gradients */}
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-violet-950/30 to-cyan-950/30" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/50 to-transparent" />
-            
-            {/* Left Side - Logo/Brand Space (Optional) */}
-            <div className="flex-shrink-0 relative z-10 w-0 lg:w-auto">
-              {/* You can add a logo here if needed */}
-            </div>
-
-            {/* Center - Main Navigation */}
-            <div className="flex-1 flex justify-center relative z-10 max-w-4xl mx-auto">
-              <NavigationMenu>
-                <NavigationMenuList className="flex-wrap justify-center gap-1">
-                  {/* Home Button - Always accessible */}
-                  <NavigationMenuItem>
-                    <Link
-                      href="/"
-                      className={cn(
-                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ease-out",
-                        isActivePath("/") 
-                          ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/30 scale-105" 
-                          : "bg-gradient-to-r from-violet-600/80 to-purple-600/80 text-white hover:from-violet-600 hover:to-purple-600 hover:shadow-lg hover:shadow-violet-500/25 hover:scale-105",
-                        "border border-transparent hover:border-violet-400/30 transform gap-2"
-                      )}
-                    >
-                      <Home className="w-4 h-4" />
-                      <span className="hidden sm:inline">Home</span>
-                    </Link>
-                  </NavigationMenuItem>
-
-                  {/* Protected Meeting Button */}
-                  <NavigationMenuItem>
-                    <ProtectedLink
-                      href="/meeting"
-                      user={user}
-                      requiresAuth={true}
-                      className={cn(
-                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
-                        isActivePath("/meeting")
-                          ? "text-white bg-white/15 border-violet-400/40"
-                          : "text-slate-200 hover:text-white hover:bg-white/10",
-                        "border border-transparent hover:border-violet-400/40 backdrop-blur-sm group"
-                      )}
-                    >
-                      <span className="relative flex items-center gap-2">
-                        <Video className="w-4 h-4" />
-                        <span className="hidden sm:inline">Meeting</span>
-                        <span className={cn(
-                          "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
-                          isActivePath("/meeting") ? "w-full" : "w-0 group-hover:w-full"
-                        )} />
-                      </span>
-                    </ProtectedLink>
-                  </NavigationMenuItem>
-
-                  {/* Protected Diary Button */}
-                  <NavigationMenuItem>
-                    <ProtectedLink
-                      href="/diaryEditor"
-                      user={user}
-                      requiresAuth={true}
-                      className={cn(
-                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
-                        isActivePath("/diaryEditor")
-                          ? "text-white bg-white/15 border-violet-400/40"
-                          : "text-slate-200 hover:text-white hover:bg-white/10",
-                        "border border-transparent hover:border-violet-400/40 backdrop-blur-sm group"
-                      )}
-                    >
-                      <span className="relative flex items-center gap-2">
-                        <BookOpen className="w-4 h-4" />
-                        <span className="hidden sm:inline">Diary</span>
-                        <span className={cn(
-                          "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
-                          isActivePath("/diaryEditor") ? "w-full" : "w-0 group-hover:w-full"
-                        )} />
-                      </span>
-                    </ProtectedLink>
-                  </NavigationMenuItem>
-
-                  {/* Student Tools Dropdown - Mixed access */}
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger className="gap-2 px-4">
-                      <GraduationCap className="w-4 h-4" />
-                      <span className="hidden md:inline">Student Tools</span>
-                      <span className="md:hidden">Tools</span>
-                      {!user && <Lock className="w-3 h-3 text-yellow-500 ml-1" />}
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <div className="grid w-[500px] gap-1 p-4 md:w-[600px] md:grid-cols-2 lg:w-[700px] bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-xl shadow-2xl">
-                        {Products.map((product) => (
-                          <ListItem
-                            key={product.title}
-                            title={product.title}
-                            href={product.href}
-                            icon={product.icon}
-                            isActive={isActivePath(product.href)}
-                            user={user}
-                            requiresAuth={product.requiresAuth}
-                            showTooltip={false}
-                          >
-                            {product.description}
-                          </ListItem>
-                        ))}
-                      </div>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-
-                  {/* Protected Resume Button */}
-                  <NavigationMenuItem>
-                    <ProtectedLink
-                      href="/Select"
-                      user={user}
-                      requiresAuth={true}
-                      className={cn(
-                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
-                        isActivePath("/Select")
-                          ? "text-white bg-white/15 border-violet-400/40"
-                          : "text-slate-200 hover:text-white hover:bg-white/10",
-                        "border border-transparent hover:border-violet-400/40 backdrop-blur-sm group"
-                      )}
-                    >
-                      <span className="relative flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
-                        <span className="hidden sm:inline">Resume</span>
-                        <span className={cn(
-                          "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
-                          isActivePath("/Select") ? "w-full" : "w-0 group-hover:w-full"
-                        )} />
-                      </span>
-                    </ProtectedLink>
-                  </NavigationMenuItem>
-
-                  {/* Protected AI Chatbot Button */}
-                  <NavigationMenuItem>
-                    <ProtectedLink
-                      href="/bot"
-                      user={user}
-                      requiresAuth={true}
-                      className={cn(
-                        "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ease-out",
-                        isActivePath("/bot")
-                          ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30 scale-105"
-                          : "bg-gradient-to-r from-cyan-500/80 to-blue-600/80 text-white hover:from-cyan-500 hover:to-blue-600 hover:shadow-lg hover:shadow-cyan-500/25 hover:scale-105",
-                        "border border-transparent hover:border-cyan-400/30 transform gap-2"
-                      )}
-                    >
-                      <Bot className="w-4 h-4" />
-                      <span className="hidden sm:inline">AI Chatbot</span>
-                      <span className="sm:hidden">AI</span>
-                    </ProtectedLink>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
-            </div>
-
-            {/* Right Side - Auth Section - Better Balanced */}
-            <div className="flex-shrink-0 relative z-10 flex items-center justify-end min-w-0">
-              {isLoading ? (
-                // Compact loading state
-                <div className="flex items-center space-x-3 bg-slate-900/60 backdrop-blur-xl border border-slate-700/60 rounded-lg px-4 py-2 shadow-md">
-                  <LoadingSpinner size="sm" />
-                  <span className="text-sm text-slate-300 hidden sm:inline">Loading...</span>
-                </div>
-              ) : user ? (
-                // User is logged in - Better balanced profile
-                <UserProfile user={user} isLoading={isLoading} />
-              ) : (
-                // User is not logged in - Better balanced login section
-                <div className="flex items-center space-x-3">
-                  <div className="text-sm text-slate-400 hidden lg:block whitespace-nowrap">
-                    Login for all features
-                  </div>
-                  <AuthButton
-                    variant="login"
-                    size="default"
-                    showFullLoader={true}
-                  >
-                    Sign In
-                  </AuthButton>
-                </div>
+    <div className={cn("relative", className)}>
+      <NavigationMenu>
+        <NavigationMenuList className="flex-wrap justify-center gap-1">
+          {/* Home Button - Always accessible */}
+          <NavigationMenuItem>
+            <Link
+              href="/"
+              className={cn(
+                "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ease-out",
+                isActivePath("/")
+                  ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/30 scale-105"
+                  : "bg-gradient-to-r from-violet-600/80 to-purple-600/80 text-white hover:from-violet-600 hover:to-purple-600 hover:shadow-lg hover:shadow-violet-500/25 hover:scale-105",
+                "border border-transparent hover:border-violet-400/30 transform gap-2"
               )}
-            </div>
-          </nav>
-        </motion.div>
-      )}
-    </AnimatePresence>
+            >
+              <Home className="w-4 h-4" />
+              <span className="hidden sm:inline">Home</span>
+            </Link>
+          </NavigationMenuItem>
+
+          {/* Protected Meeting Button */}
+          <NavigationMenuItem>
+            <ProtectedLink
+              href="/meeting"
+              user={user}
+              requiresAuth={true}
+              className={cn(
+                "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
+                isActivePath("/meeting")
+                  ? "text-white bg-white/15 border-violet-400/40"
+                  : "text-slate-200 hover:text-white hover:bg-white/10",
+                "border border-transparent hover:border-violet-400/40 backdrop-blur-sm group"
+              )}
+            >
+              <span className="relative flex items-center gap-2">
+                <Video className="w-4 h-4" />
+                <span className="hidden sm:inline">Meeting</span>
+                <span
+                  className={cn(
+                    "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
+                    isActivePath("/meeting")
+                      ? "w-full"
+                      : "w-0 group-hover:w-full"
+                  )}
+                />
+              </span>
+            </ProtectedLink>
+          </NavigationMenuItem>
+
+          {/* Protected Diary Button */}
+          <NavigationMenuItem>
+            <ProtectedLink
+              href="/diaryEditor"
+              user={user}
+              requiresAuth={true}
+              className={cn(
+                "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
+                isActivePath("/diaryEditor")
+                  ? "text-white bg-white/15 border-violet-400/40"
+                  : "text-slate-200 hover:text-white hover:bg-white/10",
+                "border border-transparent hover:border-violet-400/40 backdrop-blur-sm group"
+              )}
+            >
+              <span className="relative flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                <span className="hidden sm:inline">Diary</span>
+                <span
+                  className={cn(
+                    "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
+                    isActivePath("/diaryEditor")
+                      ? "w-full"
+                      : "w-0 group-hover:w-full"
+                  )}
+                />
+              </span>
+            </ProtectedLink>
+          </NavigationMenuItem>
+
+          {/* Student Tools Dropdown - Mixed access */}
+          <NavigationMenuItem>
+            <NavigationMenuTrigger className="gap-2 px-4">
+              <GraduationCap className="w-4 h-4" />
+              <span className="hidden md:inline">Student Tools</span>
+              <span className="md:hidden">Tools</span>
+              {!user && <Lock className="w-3 h-3 text-yellow-500 ml-1" />}
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <div className="grid w-[500px] gap-1 p-4 md:w-[600px] md:grid-cols-2 lg:w-[700px] bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-xl shadow-2xl">
+                {Products.map((product) => (
+                  <ListItem
+                    key={product.title}
+                    title={product.title}
+                    href={product.href}
+                    icon={product.icon}
+                    isActive={isActivePath(product.href)}
+                    user={user}
+                    requiresAuth={product.requiresAuth}
+                    showTooltip={false}
+                  >
+                    {product.description}
+                  </ListItem>
+                ))}
+              </div>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+
+          {/* Protected Resume Button */}
+          <NavigationMenuItem>
+            <ProtectedLink
+              href="/Select"
+              user={user}
+              requiresAuth={true}
+              className={cn(
+                "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
+                isActivePath("/Select")
+                  ? "text-white bg-white/15 border-violet-400/40"
+                  : "text-slate-200 hover:text-white hover:bg-white/10",
+                "border border-transparent hover:border-violet-400/40 backdrop-blur-sm group"
+              )}
+            >
+              <span className="relative flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                <span className="hidden sm:inline">Resume</span>
+                <span
+                  className={cn(
+                    "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
+                    isActivePath("/Select")
+                      ? "w-full"
+                      : "w-0 group-hover:w-full"
+                  )}
+                />
+              </span>
+            </ProtectedLink>
+          </NavigationMenuItem>
+
+          {/* Protected AI Chatbot Button */}
+          <NavigationMenuItem>
+            <ProtectedLink
+              href="/bot"
+              user={user}
+              requiresAuth={true}
+              className={cn(
+                "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ease-out",
+                isActivePath("/bot")
+                  ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30 scale-105"
+                  : "bg-gradient-to-r from-cyan-500/80 to-blue-600/80 text-white hover:from-cyan-500 hover:to-blue-600 hover:shadow-lg hover:shadow-cyan-500/25 hover:scale-105",
+                "border border-transparent hover:border-cyan-400/30 transform gap-2"
+              )}
+            >
+              <Bot className="w-4 h-4" />
+              <span className="hidden sm:inline">AI Chatbot</span>
+              <span className="sm:hidden">AI</span>
+            </ProtectedLink>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    </div>
   );
 }
 
 // Enhanced ListItem component with protection
 const ListItem = React.forwardRef(
-  ({ className, title, children, icon: IconComponent, isActive, user, requiresAuth = true, showTooltip = true, ...props }, ref) => {
+  (
+    {
+      className,
+      title,
+      children,
+      icon: IconComponent,
+      isActive,
+      user,
+      requiresAuth = true,
+      showTooltip = true,
+      ...props
+    },
+    ref
+  ) => {
     const [showLoginPrompt, setShowLoginPrompt] = React.useState(false);
-    
+
     const handleClick = (e) => {
       if (requiresAuth && !user) {
         e.preventDefault();
@@ -588,9 +376,9 @@ const ListItem = React.forwardRef(
               "block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 ease-out",
               isActive && !isLocked
                 ? "bg-gradient-to-r from-violet-600/20 to-cyan-600/20 text-white border-violet-400/40"
-                : !isLocked 
-                  ? "hover:bg-gradient-to-r hover:from-violet-600/10 hover:to-cyan-600/10 hover:text-white"
-                  : "opacity-60 cursor-not-allowed",
+                : !isLocked
+                ? "hover:bg-gradient-to-r hover:from-violet-600/10 hover:to-cyan-600/10 hover:text-white"
+                : "opacity-60 cursor-not-allowed",
               "focus:bg-gradient-to-r focus:from-violet-600/10 focus:to-cyan-600/10 focus:text-white",
               "border border-transparent hover:border-violet-400/30 hover:shadow-lg hover:shadow-violet-500/10",
               "group bg-slate-800/40 backdrop-blur-sm transform",
@@ -601,33 +389,47 @@ const ListItem = React.forwardRef(
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <IconComponent className={cn(
-                  "w-4 h-4 transition-colors duration-300",
-                  isLocked ? "text-slate-500" : "text-violet-400 group-hover:text-violet-300"
-                )} />
-                <div className={cn(
-                  "text-sm font-semibold leading-none transition-colors duration-300",
-                  isLocked ? "text-slate-400" : "text-white group-hover:text-violet-300"
-                )}>
+                <IconComponent
+                  className={cn(
+                    "w-4 h-4 transition-colors duration-300",
+                    isLocked
+                      ? "text-slate-500"
+                      : "text-violet-400 group-hover:text-violet-300"
+                  )}
+                />
+                <div
+                  className={cn(
+                    "text-sm font-semibold leading-none transition-colors duration-300",
+                    isLocked
+                      ? "text-slate-400"
+                      : "text-white group-hover:text-violet-300"
+                  )}
+                >
                   {title}
                 </div>
                 {isLocked && <Lock className="w-3 h-3 text-yellow-500 ml-2" />}
               </div>
-              <div className={cn(
-                "h-0.5 bg-gradient-to-r from-violet-400 to-cyan-400 transition-all duration-300 rounded-full",
-                isActive && !isLocked ? "w-6" : "w-0",
-                !isLocked && "group-hover:w-6"
-              )} />
+              <div
+                className={cn(
+                  "h-0.5 bg-gradient-to-r from-violet-400 to-cyan-400 transition-all duration-300 rounded-full",
+                  isActive && !isLocked ? "w-6" : "w-0",
+                  !isLocked && "group-hover:w-6"
+                )}
+              />
             </div>
-            <p className={cn(
-              "line-clamp-2 text-xs leading-relaxed transition-colors duration-300 pl-7",
-              isLocked ? "text-slate-500" : "text-slate-400 group-hover:text-slate-300"
-            )}>
+            <p
+              className={cn(
+                "line-clamp-2 text-xs leading-relaxed transition-colors duration-300 pl-7",
+                isLocked
+                  ? "text-slate-500"
+                  : "text-slate-400 group-hover:text-slate-300"
+              )}
+            >
               {children}
             </p>
           </a>
         </NavigationMenuLink>
-        
+
         {/* Login prompt for dropdown items */}
         <AnimatePresence>
           {showLoginPrompt && showTooltip && (

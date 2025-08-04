@@ -54,7 +54,7 @@ const SummaryAdd = () => {
                     <Field name="summary">
                       {({ field, form }) => (
                         <Editor
-                          apiKey="9l5t5x3spklydl3958xfkwdnjxp5p95b23wxd5mj1sfhcv71"
+                          apiKey="0zouno0u1hw36br820o7qih9c8j386l4o30ntm89ps3czmiy"
                           onInit={(evt, editor) => (editorRef.current = editor)}
                           initialValue={initialSummary}
                           init={{
