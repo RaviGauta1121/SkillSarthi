@@ -1,67 +1,135 @@
 "use client";
 import React from "react";
 
-export default function Loader({ 
-  variant = "default", 
+export default function Loader({
+  variant = "default",
   message = "Loading...",
-  showMessage = true 
+  showMessage = true
 }) {
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[999999999] flex items-center justify-center">
       <div className="flex flex-col items-center space-y-6">
-        
-        {/* Default spinner */}
+        {/* Uiverse.io circles loader */}
         {variant === "default" && (
-          <div className="w-16 h-16 border-4 border-gray-300 border-t-violet-500 rounded-full animate-spin"></div>
+          <div className="flex justify-center items-center">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="relative flex items-center justify-center w-5 h-5 border-2 border-gray-300 rounded-full mx-2.5 bg-transparent"
+                style={{
+                  animation: `circleKeys 2s ease-in-out infinite`,
+                  animationDelay: `${i * 0.3}s`
+                }}
+              >
+                <div
+                  className="absolute w-4 h-4 rounded-full bg-gray-300 transform -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    animation: `dotKeys 2s ease-in-out infinite`,
+                    animationDelay: `${i * 0.3}s`
+                  }}
+                ></div>
+                <div
+                  className="absolute w-5 h-5 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    animation: `outlineKeys 2s ease-in-out infinite`,
+                    animationDelay: `${(i + 3) * 0.3}s`
+                  }}
+                ></div>
+              </div>
+            ))}
+          </div>
         )}
 
-        {/* Wave variant */}
+        {/* Wave variant with Uiverse styling */}
         {variant === "wave" && (
-          <div className="relative flex items-center justify-center">
-            {[...Array(3)].map((_, i) => (
+          <div className="flex justify-center items-center">
+            {[...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className="absolute w-16 h-16 border-2 border-violet-400/50 rounded-full animate-ping"
+                className="relative flex items-center justify-center w-5 h-5 border-2 border-violet-400 rounded-full mx-2.5 bg-transparent"
                 style={{
-                  animationDelay: `${i * 0.5}s`,
-                  animationDuration: '2s'
+                  animation: `circleKeys 2s ease-in-out infinite`,
+                  animationDelay: `${i * 0.2}s`
                 }}
-              ></div>
+              >
+                <div
+                  className="absolute w-4 h-4 rounded-full bg-violet-400 transform -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    animation: `dotKeys 2s ease-in-out infinite`,
+                    animationDelay: `${i * 0.2}s`
+                  }}
+                ></div>
+                <div
+                  className="absolute w-5 h-5 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    animation: `outlineKeysViolet 2s ease-in-out infinite`,
+                    animationDelay: `${(i + 2) * 0.3}s`
+                  }}
+                ></div>
+              </div>
             ))}
-            <div className="w-8 h-8 bg-violet-500 rounded-full"></div>
           </div>
         )}
 
-        {/* Helix variant */}
+        {/* Helix variant with Uiverse styling */}
         {variant === "helix" && (
-          <div className="relative w-16 h-16">
-            <div className="absolute inset-0 animate-spin" style={{ animationDuration: '2s' }}>
-              <div className="w-full h-full border-2 border-transparent border-t-violet-400 border-b-purple-400 rounded-full"></div>
-            </div>
-            <div className="absolute inset-2 animate-spin" style={{ animationDuration: '1.5s', animationDirection: 'reverse' }}>
-              <div className="w-full h-full border-2 border-transparent border-l-cyan-400 border-r-pink-400 rounded-full"></div>
-            </div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-violet-500 rounded-full"></div>
+          <div className="flex justify-center items-center">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="relative flex items-center justify-center w-5 h-5 border-2 border-purple-400 rounded-full mx-1.5 bg-transparent"
+                style={{
+                  animation: `circleKeys 2s ease-in-out infinite`,
+                  animationDelay: `${i * 0.25}s`
+                }}
+              >
+                <div
+                  className="absolute w-4 h-4 rounded-full bg-purple-400 transform -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    animation: `dotKeys 2s ease-in-out infinite`,
+                    animationDelay: `${i * 0.25}s`
+                  }}
+                ></div>
+                <div
+                  className="absolute w-5 h-5 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    animation: `outlineKeysPurple 2s ease-in-out infinite`,
+                    animationDelay: `${(i + 4) * 0.25}s`
+                  }}
+                ></div>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Quantum variant */}
+        {/* Quantum variant with Uiverse styling */}
         {variant === "quantum" && (
-          <div className="relative w-20 h-20">
-            {[...Array(8)].map((_, i) => (
+          <div className="flex justify-center items-center">
+            {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="absolute w-3 h-3 bg-violet-400 rounded-full animate-pulse"
+                className="relative flex items-center justify-center w-4 h-4 border-2 border-cyan-400 rounded-full mx-1 bg-transparent"
                 style={{
-                  top: `${50 + 35 * Math.sin((i * Math.PI * 2) / 8)}%`,
-                  left: `${50 + 35 * Math.cos((i * Math.PI * 2) / 8)}%`,
-                  transform: 'translate(-50%, -50%)',
-                  animationDelay: `${i * 0.2}s`,
-                  animationDuration: '1.5s'
+                  animation: `circleKeys 1.8s ease-in-out infinite`,
+                  animationDelay: `${i * 0.15}s`
                 }}
-              ></div>
+              >
+                <div
+                  className="absolute w-3 h-3 rounded-full bg-cyan-400 transform -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    animation: `dotKeys 1.8s ease-in-out infinite`,
+                    animationDelay: `${i * 0.15}s`
+                  }}
+                ></div>
+                <div
+                  className="absolute w-4 h-4 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    animation: `outlineKeysCyan 1.8s ease-in-out infinite`,
+                    animationDelay: `${(i + 3) * 0.2}s`
+                  }}
+                ></div>
+              </div>
             ))}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 border-2 border-violet-400 rounded-full animate-spin"></div>
           </div>
         )}
 
@@ -72,6 +140,95 @@ export default function Loader({
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        @keyframes circleKeys {
+          0% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.5);
+            opacity: 0.5;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+
+        @keyframes dotKeys {
+          0% {
+            transform: scale(1) translate(-50%, -50%);
+          }
+          50% {
+            transform: scale(0) translate(-50%, -50%);
+          }
+          100% {
+            transform: scale(1) translate(-50%, -50%);
+          }
+        }
+
+        @keyframes outlineKeys {
+          0% {
+            transform: scale(0) translate(-50%, -50%);
+            outline: solid 20px rgb(209, 213, 219);
+            outline-offset: 0;
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1) translate(-50%, -50%);
+            outline: solid 0 transparent;
+            outline-offset: 20px;
+            opacity: 0;
+          }
+        }
+
+        @keyframes outlineKeysViolet {
+          0% {
+            transform: scale(0) translate(-50%, -50%);
+            outline: solid 20px rgb(167, 139, 250);
+            outline-offset: 0;
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1) translate(-50%, -50%);
+            outline: solid 0 transparent;
+            outline-offset: 20px;
+            opacity: 0;
+          }
+        }
+
+        @keyframes outlineKeysPurple {
+          0% {
+            transform: scale(0) translate(-50%, -50%);
+            outline: solid 20px rgb(196, 181, 253);
+            outline-offset: 0;
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1) translate(-50%, -50%);
+            outline: solid 0 transparent;
+            outline-offset: 20px;
+            opacity: 0;
+          }
+        }
+
+        @keyframes outlineKeysCyan {
+          0% {
+            transform: scale(0) translate(-50%, -50%);
+            outline: solid 15px rgb(103, 232, 249);
+            outline-offset: 0;
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1) translate(-50%, -50%);
+            outline: solid 0 transparent;
+            outline-offset: 15px;
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }

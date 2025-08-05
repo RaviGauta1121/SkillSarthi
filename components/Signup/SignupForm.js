@@ -129,24 +129,24 @@ export function FormalSignupForm() {
 
   return (
     <div className={cn(
-      "max-w-lg w-full mx-auto backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl",
+      "w-full max-w-md sm:max-w-lg mx-auto backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl",
       "transform transition-all duration-1000 ease-out",
       isVisible 
         ? "translate-y-0 opacity-100 scale-100" 
         : "translate-y-12 opacity-0 scale-95"
     )}>
       {/* Header with animation */}
-      <div className="text-center mb-8">
+      <div className="text-center mb-6 sm:mb-8">
         <div className={cn(
-          "inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl mb-4 shadow-lg",
+          "inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl mb-3 sm:mb-4 shadow-lg",
           "transform transition-all duration-700 delay-300",
           isVisible ? "rotate-0 scale-100" : "rotate-180 scale-0"
         )}>
-          <IconUserPlus className="w-8 h-8 text-white" />
+          <IconUserPlus className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
         </div>
         
         <h1 className={cn(
-          "text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-2",
+          "text-2xl sm:text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-2",
           "transform transition-all duration-700 delay-500",
           isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         )}>
@@ -154,7 +154,7 @@ export function FormalSignupForm() {
         </h1>
         
         <p className={cn(
-          "text-gray-400 text-sm",
+          "text-gray-400 text-xs sm:text-sm",
           "transform transition-all duration-700 delay-700",
           isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         )}>
@@ -177,10 +177,10 @@ export function FormalSignupForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
         {/* Name Fields */}
         <div className={cn(
-          "grid grid-cols-2 gap-4",
+          "grid grid-cols-1 sm:grid-cols-2 gap-4",
           "transform transition-all duration-700 delay-900",
           isVisible ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
         )}>
@@ -196,7 +196,7 @@ export function FormalSignupForm() {
                 placeholder="First name"
                 disabled={isLoading}
                 className={cn(
-                  "pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400",
+                  "pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 text-sm sm:text-base",
                   "focus:border-blue-400/50 focus:bg-white/10 transition-all duration-200",
                   "hover:border-white/20 hover:bg-white/5",
                   errors.firstName && "border-red-400/50 focus:border-red-400/50"
@@ -229,7 +229,7 @@ export function FormalSignupForm() {
                 placeholder="Last name"
                 disabled={isLoading}
                 className={cn(
-                  "pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400",
+                  "pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 text-sm sm:text-base",
                   "focus:border-blue-400/50 focus:bg-white/10 transition-all duration-200",
                   "hover:border-white/20 hover:bg-white/5",
                   errors.lastName && "border-red-400/50 focus:border-red-400/50"
@@ -267,7 +267,7 @@ export function FormalSignupForm() {
               placeholder="Enter your email"
               disabled={isLoading}
               className={cn(
-                "pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400",
+                "pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 text-sm sm:text-base",
                 "focus:border-blue-400/50 focus:bg-white/10 transition-all duration-200",
                 "hover:border-white/20 hover:bg-white/5",
                 errors.email && "border-red-400/50 focus:border-red-400/50"
@@ -304,7 +304,7 @@ export function FormalSignupForm() {
               placeholder="Create a strong password"
               disabled={isLoading}
               className={cn(
-                "pl-12 pr-12 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400",
+                "pl-10 sm:pl-12 pr-10 sm:pr-12 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 text-sm sm:text-base",
                 "focus:border-blue-400/50 focus:bg-white/10 transition-all duration-200",
                 "hover:border-white/20 hover:bg-white/5",
                 errors.password && "border-red-400/50 focus:border-red-400/50"
@@ -373,7 +373,7 @@ export function FormalSignupForm() {
             type="submit"
             disabled={isLoading || isSubmitting}
             className={cn(
-              "w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl",
+              "w-full py-2.5 sm:py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl text-sm sm:text-base",
               "hover:from-blue-700 hover:to-indigo-700 transform hover:scale-[1.02] active:scale-[0.98]",
               "transition-all duration-200 shadow-lg hover:shadow-xl",
               "disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none",
@@ -391,7 +391,7 @@ export function FormalSignupForm() {
 
         {/* Divider */}
         <div className={cn(
-          "relative my-8",
+          "relative my-6 sm:my-8",
           "transform transition-all duration-700 delay-1300",
           isVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"
         )}>
@@ -442,11 +442,11 @@ export function FormalSignupForm() {
 
         {/* Sign In Link */}
         <div className={cn(
-          "text-center pt-6 border-t border-gray-700",
+          "text-center sm:pt-6 border-t border-gray-700",
           "transform transition-all duration-700 delay-1500",
           isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         )}>
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 text-xs sm:text-sm">
             Already have an account?{" "}
             <button
               type="button"

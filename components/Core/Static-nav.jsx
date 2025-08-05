@@ -31,6 +31,9 @@ import {
   Lock,
 } from "lucide-react";
 
+// Import your existing Loader component
+import Loader from "../../components/loader/loader"; // Adjust path as needed
+
 const Products = [
   {
     title: "Memory Matrix",
@@ -98,7 +101,7 @@ const Products = [
   },
 ];
 
-// Protected Link Component
+// Enhanced Protected Link Component with Loader
 const ProtectedLink = ({
   href,
   children,
@@ -106,6 +109,7 @@ const ProtectedLink = ({
   user,
   requiresAuth = true,
   showTooltip = true,
+  onNavigate,
   ...props
 }) => {
   const [showLoginPrompt, setShowLoginPrompt] = React.useState(false);
@@ -116,6 +120,11 @@ const ProtectedLink = ({
       setShowLoginPrompt(true);
       setTimeout(() => setShowLoginPrompt(false), 3000);
       return;
+    }
+    
+    // Trigger loader when navigating
+    if (onNavigate) {
+      onNavigate(href);
     }
   };
 
@@ -153,7 +162,7 @@ const ProtectedLink = ({
   }
 
   return (
-    <Link href={href} className={className} {...props}>
+    <Link href={href} className={className} onClick={handleClick} {...props}>
       {children}
     </Link>
   );
@@ -167,177 +176,223 @@ export function StaticNav({
   isLoading = false, // Accept loading state from parent
 }) {
   const [mounted, setMounted] = React.useState(false);
+  const [showLoader, setShowLoader] = React.useState(false);
+  const [loadingMessage, setLoadingMessage] = React.useState("Loading...");
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Handle navigation with loader
+  const handleNavigation = (href) => {
+    const messages = {
+      "/": "Loading Home...",
+      "/meeting": "Joining Meeting...",
+      "/diaryEditor": "Opening Diary...",
+      "/Select": "Loading Resume Builder...",
+      "/bot": "Starting AI Chatbot...",
+      "/games/memory-matrix": "Loading Memory Matrix...",
+      "/code-editor": "Opening Code Editor...",
+      "/games/syntax-slayer": "Loading Syntax Slayer...",
+      "/pomodoro-timer": "Starting Pomodoro Timer...",
+      "/todo": "Loading Todo List...",
+      "/mentorship": "Connecting to Mentorship...",
+      "/doubts": "Loading Doubts Section...",
+      "/articles": "Loading Articles...",
+    };
+
+    setLoadingMessage(messages[href] || "Loading...");
+    setShowLoader(true);
+
+    // Simulate loading time (you can remove this and handle it with actual navigation)
+    setTimeout(() => {
+      setShowLoader(false);
+    }, 1500);
+  };
 
   if (!mounted) return null;
 
   const isActivePath = (href) => currentPath === href;
 
   return (
-    <div className={cn("relative", className)}>
-      <NavigationMenu>
-        <NavigationMenuList className="flex-wrap justify-center gap-1">
-          {/* Home Button - Always accessible */}
-          <NavigationMenuItem>
-            <Link
-              href="/"
-              className={cn(
-                "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ease-out",
-                isActivePath("/")
-                  ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/30 scale-105"
-                  : "bg-gradient-to-r from-violet-600/80 to-purple-600/80 text-white hover:from-violet-600 hover:to-purple-600 hover:shadow-lg hover:shadow-violet-500/25 hover:scale-105",
-                "border border-transparent hover:border-violet-400/30 transform gap-2"
-              )}
-            >
-              <Home className="w-4 h-4" />
-              <span className="hidden sm:inline">Home</span>
-            </Link>
-          </NavigationMenuItem>
+    <>
+      {/* Loader Component */}
+      {showLoader && (
+        <Loader 
+          variant="wave" 
+          message={loadingMessage}
+          showMessage={true}
+        />
+      )}
 
-          {/* Protected Meeting Button */}
-          <NavigationMenuItem>
-            <ProtectedLink
-              href="/meeting"
-              user={user}
-              requiresAuth={true}
-              className={cn(
-                "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
-                isActivePath("/meeting")
-                  ? "text-white bg-white/15 border-violet-400/40"
-                  : "text-slate-200 hover:text-white hover:bg-white/10",
-                "border border-transparent hover:border-violet-400/40 backdrop-blur-sm group"
-              )}
-            >
-              <span className="relative flex items-center gap-2">
-                <Video className="w-4 h-4" />
-                <span className="hidden sm:inline">Meeting</span>
-                <span
-                  className={cn(
-                    "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
-                    isActivePath("/meeting")
-                      ? "w-full"
-                      : "w-0 group-hover:w-full"
-                  )}
-                />
-              </span>
-            </ProtectedLink>
-          </NavigationMenuItem>
+      <div className={cn("relative", className)}>
+        <NavigationMenu>
+          <NavigationMenuList className="flex-wrap justify-center gap-1">
+            {/* Home Button - Always accessible */}
+            <NavigationMenuItem>
+              <Link
+                href="/"
+                onClick={() => handleNavigation("/")}
+                className={cn(
+                  "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ease-out",
+                  isActivePath("/")
+                    ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/30 scale-105"
+                    : "bg-gradient-to-r from-violet-600/80 to-purple-600/80 text-white hover:from-violet-600 hover:to-purple-600 hover:shadow-lg hover:shadow-violet-500/25 hover:scale-105",
+                  "border border-transparent hover:border-violet-400/30 transform gap-2"
+                )}
+              >
+                <Home className="w-4 h-4" />
+                <span className="hidden sm:inline">Home</span>
+              </Link>
+            </NavigationMenuItem>
 
-          {/* Protected Diary Button */}
-          <NavigationMenuItem>
-            <ProtectedLink
-              href="/diaryEditor"
-              user={user}
-              requiresAuth={true}
-              className={cn(
-                "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
-                isActivePath("/diaryEditor")
-                  ? "text-white bg-white/15 border-violet-400/40"
-                  : "text-slate-200 hover:text-white hover:bg-white/10",
-                "border border-transparent hover:border-violet-400/40 backdrop-blur-sm group"
-              )}
-            >
-              <span className="relative flex items-center gap-2">
-                <BookOpen className="w-4 h-4" />
-                <span className="hidden sm:inline">Diary</span>
-                <span
-                  className={cn(
-                    "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
-                    isActivePath("/diaryEditor")
-                      ? "w-full"
-                      : "w-0 group-hover:w-full"
-                  )}
-                />
-              </span>
-            </ProtectedLink>
-          </NavigationMenuItem>
+            {/* Protected Meeting Button */}
+            <NavigationMenuItem>
+              <ProtectedLink
+                href="/meeting"
+                user={user}
+                requiresAuth={true}
+                onNavigate={handleNavigation}
+                className={cn(
+                  "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
+                  isActivePath("/meeting")
+                    ? "text-white bg-white/15 border-violet-400/40"
+                    : "text-slate-200 hover:text-white hover:bg-white/10",
+                  "border border-transparent hover:border-violet-400/40 backdrop-blur-sm group"
+                )}
+              >
+                <span className="relative flex items-center gap-2">
+                  <Video className="w-4 h-4" />
+                  <span className="hidden sm:inline">Meeting</span>
+                  <span
+                    className={cn(
+                      "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
+                      isActivePath("/meeting")
+                        ? "w-full"
+                        : "w-0 group-hover:w-full"
+                    )}
+                  />
+                </span>
+              </ProtectedLink>
+            </NavigationMenuItem>
 
-          {/* Student Tools Dropdown - Mixed access */}
-          <NavigationMenuItem>
-            <NavigationMenuTrigger className="gap-2 px-4">
-              <GraduationCap className="w-4 h-4" />
-              <span className="hidden md:inline">Student Tools</span>
-              <span className="md:hidden">Tools</span>
-              {!user && <Lock className="w-3 h-3 text-yellow-500 ml-1" />}
-            </NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <div className="grid w-[500px] gap-1 p-4 md:w-[600px] md:grid-cols-2 lg:w-[700px] bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-xl shadow-2xl">
-                {Products.map((product) => (
-                  <ListItem
-                    key={product.title}
-                    title={product.title}
-                    href={product.href}
-                    icon={product.icon}
-                    isActive={isActivePath(product.href)}
-                    user={user}
-                    requiresAuth={product.requiresAuth}
-                    showTooltip={false}
-                  >
-                    {product.description}
-                  </ListItem>
-                ))}
-              </div>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
+            {/* Protected Diary Button */}
+            <NavigationMenuItem>
+              <ProtectedLink
+                href="/diaryEditor"
+                user={user}
+                requiresAuth={true}
+                onNavigate={handleNavigation}
+                className={cn(
+                  "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
+                  isActivePath("/diaryEditor")
+                    ? "text-white bg-white/15 border-violet-400/40"
+                    : "text-slate-200 hover:text-white hover:bg-white/10",
+                  "border border-transparent hover:border-violet-400/40 backdrop-blur-sm group"
+                )}
+              >
+                <span className="relative flex items-center gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  <span className="hidden sm:inline">Diary</span>
+                  <span
+                    className={cn(
+                      "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
+                      isActivePath("/diaryEditor")
+                        ? "w-full"
+                        : "w-0 group-hover:w-full"
+                    )}
+                  />
+                </span>
+              </ProtectedLink>
+            </NavigationMenuItem>
 
-          {/* Protected Resume Button */}
-          <NavigationMenuItem>
-            <ProtectedLink
-              href="/Select"
-              user={user}
-              requiresAuth={true}
-              className={cn(
-                "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
-                isActivePath("/Select")
-                  ? "text-white bg-white/15 border-violet-400/40"
-                  : "text-slate-200 hover:text-white hover:bg-white/10",
-                "border border-transparent hover:border-violet-400/40 backdrop-blur-sm group"
-              )}
-            >
-              <span className="relative flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                <span className="hidden sm:inline">Resume</span>
-                <span
-                  className={cn(
-                    "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
-                    isActivePath("/Select")
-                      ? "w-full"
-                      : "w-0 group-hover:w-full"
-                  )}
-                />
-              </span>
-            </ProtectedLink>
-          </NavigationMenuItem>
+            {/* Student Tools Dropdown - Mixed access */}
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="gap-2 px-4">
+                <GraduationCap className="w-4 h-4" />
+                <span className="hidden md:inline">Student Tools</span>
+                <span className="md:hidden">Tools</span>
+                {!user && <Lock className="w-3 h-3 text-yellow-500 ml-1" />}
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <div className="grid w-[500px] gap-1 p-4 md:w-[600px] md:grid-cols-2 lg:w-[700px] bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-xl shadow-2xl">
+                  {Products.map((product) => (
+                    <ListItem
+                      key={product.title}
+                      title={product.title}
+                      href={product.href}
+                      icon={product.icon}
+                      isActive={isActivePath(product.href)}
+                      user={user}
+                      requiresAuth={product.requiresAuth}
+                      showTooltip={false}
+                      onNavigate={handleNavigation}
+                    >
+                      {product.description}
+                    </ListItem>
+                  ))}
+                </div>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
 
-          {/* Protected AI Chatbot Button */}
-          <NavigationMenuItem>
-            <ProtectedLink
-              href="/bot"
-              user={user}
-              requiresAuth={true}
-              className={cn(
-                "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ease-out",
-                isActivePath("/bot")
-                  ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30 scale-105"
-                  : "bg-gradient-to-r from-cyan-500/80 to-blue-600/80 text-white hover:from-cyan-500 hover:to-blue-600 hover:shadow-lg hover:shadow-cyan-500/25 hover:scale-105",
-                "border border-transparent hover:border-cyan-400/30 transform gap-2"
-              )}
-            >
-              <Bot className="w-4 h-4" />
-              <span className="hidden sm:inline">AI Chatbot</span>
-              <span className="sm:hidden">AI</span>
-            </ProtectedLink>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
-    </div>
+            {/* Protected Resume Button */}
+            <NavigationMenuItem>
+              <ProtectedLink
+                href="/Select"
+                user={user}
+                requiresAuth={true}
+                onNavigate={handleNavigation}
+                className={cn(
+                  "inline-flex h-11 w-max items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-out",
+                  isActivePath("/Select")
+                    ? "text-white bg-white/15 border-violet-400/40"
+                    : "text-slate-200 hover:text-white hover:bg-white/10",
+                  "border border-transparent hover:border-violet-400/40 backdrop-blur-sm group"
+                )}
+              >
+                <span className="relative flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  <span className="hidden sm:inline">Resume</span>
+                  <span
+                    className={cn(
+                      "absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 transition-all duration-300 ease-out rounded-full",
+                      isActivePath("/Select")
+                        ? "w-full"
+                        : "w-0 group-hover:w-full"
+                    )}
+                  />
+                </span>
+              </ProtectedLink>
+            </NavigationMenuItem>
+
+            {/* Protected AI Chatbot Button */}
+            <NavigationMenuItem>
+              <ProtectedLink
+                href="/bot"
+                user={user}
+                requiresAuth={true}
+                onNavigate={handleNavigation}
+                className={cn(
+                  "inline-flex h-11 w-max items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ease-out",
+                  isActivePath("/bot")
+                    ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30 scale-105"
+                    : "bg-gradient-to-r from-cyan-500/80 to-blue-600/80 text-white hover:from-cyan-500 hover:to-blue-600 hover:shadow-lg hover:shadow-cyan-500/25 hover:scale-105",
+                  "border border-transparent hover:border-cyan-400/30 transform gap-2"
+                )}
+              >
+                <Bot className="w-4 h-4" />
+                <span className="hidden sm:inline">AI Chatbot</span>
+                <span className="sm:hidden">AI</span>
+              </ProtectedLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+      </div>
+    </>
   );
 }
 
-// Enhanced ListItem component with protection
+// Enhanced ListItem component with protection and loader
 const ListItem = React.forwardRef(
   (
     {
@@ -349,6 +404,8 @@ const ListItem = React.forwardRef(
       user,
       requiresAuth = true,
       showTooltip = true,
+      onNavigate,
+      href,
       ...props
     },
     ref
@@ -362,6 +419,11 @@ const ListItem = React.forwardRef(
         setTimeout(() => setShowLoginPrompt(false), 2000);
         return;
       }
+      
+      // Trigger loader when navigating
+      if (onNavigate && href) {
+        onNavigate(href);
+      }
     };
 
     const isLocked = requiresAuth && !user;
@@ -371,6 +433,7 @@ const ListItem = React.forwardRef(
         <NavigationMenuLink asChild>
           <a
             ref={ref}
+            href={href}
             onClick={handleClick}
             className={cn(
               "block select-none space-y-2 rounded-xl p-4 leading-none no-underline outline-none transition-all duration-300 ease-out",
