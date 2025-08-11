@@ -29,6 +29,7 @@ export default function DoubtDetailPage({ params }) {
       const response = await fetch(`/api/doubts/${params.id}`);
       if (response.ok) {
         const data = await response.json();
+        console.log('Fetched doubt data:', data); // Debug log
         setDoubt(data);
       } else if (response.status === 404) {
         router.push('/doubts');
@@ -172,7 +173,15 @@ export default function DoubtDetailPage({ params }) {
     );
   }
 
-  const isAuthor = session?.user?.id === doubt.author._id;
+  // Fixed author ID comparison with multiple fallback options
+  const getAuthorId = () => {
+    if (!doubt.author) return null;
+    // Try different possible field names for the author ID
+    return doubt.author._id || doubt.author.id || doubt.author;
+  };
+
+  const isAuthor = session?.user?.id === getAuthorId();
+  
   const hasUpvoted = (solution) => {
     return solution.upvotedBy?.includes(session?.user?.id);
   };
@@ -250,7 +259,7 @@ export default function DoubtDetailPage({ params }) {
                 <span>{doubt.views} views</span>
               </div>
               <div className="text-right">
-                <div>Asked by {doubt.author.name}</div>
+                <div>Asked by {doubt.author?.name || 'Unknown'}</div>
                 <div>{formatDate(doubt.createdAt)}</div>
               </div>
             </div>
