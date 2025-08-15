@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import connectMongoDB from "@/lib/mongodb";
-import Doubt from "../../../models/Doubt";
+import Doubt from "@/models/Doubt";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import mongoose from "mongoose";
 
