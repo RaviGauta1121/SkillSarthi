@@ -11,10 +11,10 @@ const DiaryModal = ({ userId, onClose }) => {
     const currentTime = new Date().toLocaleTimeString();
 
     const diaryData = {
-      userId, // Reference to the userId
+      userId, 
       date: currentDate,
       time: currentTime,
-      content: content, // HTML content from the editor or textarea
+      content: content, 
     };
 
     try {

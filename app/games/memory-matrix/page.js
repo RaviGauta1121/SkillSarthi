@@ -162,7 +162,7 @@ const MemoryMatrixGame = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 mt-8">
       <div className="bg-gray-800 rounded-xl shadow-2xl p-8 max-w-2xl w-full">
         <h1 className="text-4xl font-bold text-center text-white mb-2">Memory Matrix</h1>
         <p className="text-center text-gray-300 mb-6">Test your memory and pattern recognition!</p>
